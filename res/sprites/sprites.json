@@ -1,0 +1,90 @@
+{
+"frames": {
+	"tremel_01.png": {
+		"frame": {"x":0, "y":0, "w":23, "h":45},
+		"spriteSourceSize": {"x":0,"y":0,"w":23,"h":45},
+		"sourceSize": {"w":23,"h":45}
+	},
+	"tremel_02.png": {
+		"frame": {"x":48, "y":45, "w":21, "h":44},
+		"spriteSourceSize": {"x":0,"y":0,"w":21,"h":44},
+		"sourceSize": {"w":21,"h":44}
+	},
+	"tremel_03.png": {
+		"frame": {"x":24, "y":0, "w":23, "h":45},
+		"spriteSourceSize": {"x":0,"y":0,"w":23,"h":45},
+		"sourceSize": {"w":23,"h":45}
+	},
+	"tremel_04.png": {
+		"frame": {"x":70, "y":0, "w":21, "h":44},
+		"spriteSourceSize": {"x":0,"y":0,"w":21,"h":44},
+		"sourceSize": {"w":21,"h":44}
+	},
+	"tremel_05.png": {
+		"frame": {"x":110, "y":0, "w":19, "h":45},
+		"spriteSourceSize": {"x":0,"y":0,"w":19,"h":45},
+		"sourceSize": {"w":19,"h":45}
+	},
+	"tremel_06.png": {
+		"frame": {"x":90, "y":45, "w":19, "h":44},
+		"spriteSourceSize": {"x":0,"y":0,"w":19,"h":44},
+		"sourceSize": {"w":19,"h":44}
+	},
+	"tremel_07.png": {
+		"frame": {"x":110, "y":0, "w":19, "h":45},
+		"spriteSourceSize": {"x":0,"y":0,"w":19,"h":45},
+		"sourceSize": {"w":19,"h":45}
+	},
+	"tremel_08.png": {
+		"frame": {"x":70, "y":45, "w":19, "h":44},
+		"spriteSourceSize": {"x":0,"y":0,"w":19,"h":44},
+		"sourceSize": {"w":19,"h":44}
+	},
+	"tremel_09.png": {
+		"frame": {"x":110, "y":46, "w":19, "h":45},
+		"spriteSourceSize": {"x":0,"y":0,"w":19,"h":45},
+		"sourceSize": {"w":19,"h":45}
+	},
+	"tremel_10.png": {
+		"frame": {"x":70, "y":90, "w":19, "h":44},
+		"spriteSourceSize": {"x":0,"y":0,"w":19,"h":44},
+		"sourceSize": {"w":19,"h":44}
+	},
+	"tremel_11.png": {
+		"frame": {"x":110, "y":46, "w":19, "h":45},
+		"spriteSourceSize": {"x":0,"y":0,"w":19,"h":45},
+		"sourceSize": {"w":19,"h":45}
+	},
+	"tremel_12.png": {
+		"frame": {"x":90, "y":90, "w":19, "h":44},
+		"spriteSourceSize": {"x":0,"y":0,"w":19,"h":44},
+		"sourceSize": {"w":19,"h":44}
+	},
+	"tremel_13.png": {
+		"frame": {"x":24, "y":46, "w":23, "h":45},
+		"spriteSourceSize": {"x":0,"y":0,"w":23,"h":45},
+		"sourceSize": {"w":23,"h":45}
+	},
+	"tremel_14.png": {
+		"frame": {"x":48, "y":0, "w":21, "h":44},
+		"spriteSourceSize": {"x":0,"y":0,"w":21,"h":44},
+		"sourceSize": {"w":21,"h":44}
+	},
+	"tremel_15.png": {
+		"frame": {"x":0, "y":46, "w":23, "h":45},
+		"spriteSourceSize": {"x":0,"y":0,"w":23,"h":45},
+		"sourceSize": {"w":23,"h":45}
+	},
+	"tremel_16.png": {
+		"frame": {"x":48, "y":90, "w":21, "h":44},
+		"spriteSourceSize": {"x":0,"y":0,"w":21,"h":44},
+		"sourceSize": {"w":21,"h":44}
+	}
+
+},
+"meta": {
+	"image": "sprites.png",
+	"size": {"w": 130, "h": 135},
+	"scale": "1"
+}
+}
