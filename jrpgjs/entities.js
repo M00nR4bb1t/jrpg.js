@@ -46,7 +46,7 @@ class Player extends Entity {
 
   update(delta) {
     if (Math.abs(Math.round(this.remX) - this.remX) < this.speed && Math.abs(Math.round(this.remY) - this.remY) < this.speed) {
-      var moveXPrev = this.moveX, moveYPrev = this.moveY;
+      var moveXPrev = this.moveX, moveYPrev = this.moveY, framePrev = this.sprite.currentFrame;
       this.remX = Math.round(this.remX);
       this.remY = Math.round(this.remY);
       this.moveX = ((this.movementKeys.indexOf('ArrowRight') == 0)?this.speed:0) - ((this.movementKeys.indexOf('ArrowLeft') == 0)?this.speed:0);
@@ -60,7 +60,7 @@ class Player extends Entity {
       if (this.moveX == 0 && this.moveY == 0) {
         this.sprite.gotoAndStop(0);
       } else if (this.moveX != moveXPrev || this.moveY != moveYPrev) {
-        this.sprite.gotoAndPlay(1);
+        this.sprite.gotoAndPlay(framePrev + 1);
       }
     }
 
