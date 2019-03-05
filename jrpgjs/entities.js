@@ -38,6 +38,7 @@ class Player extends Entity {
     this.animUp = [spriteSheet.textures[name + '_13.png'], spriteSheet.textures[name + '_14.png'], spriteSheet.textures[name + '_15.png'], spriteSheet.textures[name + '_16.png']];
 
     this.sprite = new PIXI.AnimatedSprite(this.animDown);
+    this.sprite.anchor.set(0.5, 1);
     this.sprite.animationSpeed = 0.1;
 
     this.speed = 0.05;
@@ -65,7 +66,8 @@ class Player extends Entity {
     }
 
     super.update(delta);
-    this.sprite.y -= 16;
+    this.sprite.position.x += gridWidth / 2;
+    this.sprite.position.y += gridHeight * 0.875;
   }
 
   keyDown(key) {
