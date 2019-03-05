@@ -32,10 +32,10 @@ class Player extends Entity {
   constructor(x, y, spriteSheet, name) {
     super(x, y, null);
 
-    this.animDown = [spriteSheet.textures[name + '_01.png'], spriteSheet.textures[name + '_02.png'], spriteSheet.textures[name + '_03.png'], spriteSheet.textures[name + '_04.png']];
-    this.animLeft = [spriteSheet.textures[name + '_05.png'], spriteSheet.textures[name + '_06.png'], spriteSheet.textures[name + '_07.png'], spriteSheet.textures[name + '_08.png']];
-    this.animRight = [spriteSheet.textures[name + '_09.png'], spriteSheet.textures[name + '_10.png'], spriteSheet.textures[name + '_11.png'], spriteSheet.textures[name + '_12.png']];
-    this.animUp = [spriteSheet.textures[name + '_13.png'], spriteSheet.textures[name + '_14.png'], spriteSheet.textures[name + '_15.png'], spriteSheet.textures[name + '_16.png']];
+    this.animDown = [spriteSheet.textures[name + '_D1.png'], spriteSheet.textures[name + '_D2.png'], spriteSheet.textures[name + '_D3.png'], spriteSheet.textures[name + '_D4.png']];
+    this.animLeft = [spriteSheet.textures[name + '_L1.png'], spriteSheet.textures[name + '_L2.png'], spriteSheet.textures[name + '_L3.png'], spriteSheet.textures[name + '_L4.png']];
+    this.animRight = [spriteSheet.textures[name + '_R1.png'], spriteSheet.textures[name + '_R2.png'], spriteSheet.textures[name + '_R3.png'], spriteSheet.textures[name + '_R4.png']];
+    this.animUp = [spriteSheet.textures[name + '_U1.png'], spriteSheet.textures[name + '_U2.png'], spriteSheet.textures[name + '_U3.png'], spriteSheet.textures[name + '_U4.png']];
 
     this.sprite = new PIXI.AnimatedSprite(this.animDown);
     this.sprite.anchor.set(0.5, 1);
