@@ -8,12 +8,12 @@ document.addEventListener('keydown', keyDown);
 document.addEventListener('keyup', keyUp);
 window.addEventListener('resize', resize);
 resize();
-PIXI.loader.add('res/sprites/sprites.json').load(setup);
+PIXI.Loader.shared.add('res/sprites/sprites.json').load(setup);
 
 var player;
 
 function setup() {
-  player = new Player(0, 0, PIXI.loader.resources['res/sprites/sprites.json'].spritesheet, 'tremel');
+  player = new Player(0, 0, PIXI.Loader.shared.resources['res/sprites/sprites.json'].spritesheet, 'tremel');
   app.stage.addChild(player.sprite);
 
   app.ticker.add(delta => update(delta));

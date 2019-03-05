@@ -37,7 +37,7 @@ class Player extends Entity {
     this.animRight = [spriteSheet.textures[name + '_09.png'], spriteSheet.textures[name + '_10.png'], spriteSheet.textures[name + '_11.png'], spriteSheet.textures[name + '_12.png']];
     this.animUp = [spriteSheet.textures[name + '_13.png'], spriteSheet.textures[name + '_14.png'], spriteSheet.textures[name + '_15.png'], spriteSheet.textures[name + '_16.png']];
 
-    this.sprite = new PIXI.extras.AnimatedSprite(this.animDown);
+    this.sprite = new PIXI.AnimatedSprite(this.animDown);
     this.sprite.animationSpeed = 0.1;
 
     this.speed = 0.05;
