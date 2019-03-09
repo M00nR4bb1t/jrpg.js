@@ -29,13 +29,13 @@ class Entity {
 }
 
 class Player extends Entity {
-  constructor(x, y, spriteSheet, name) {
+  constructor(x, y, texture) {
     super(x, y, null);
 
-    this.animDown = [spriteSheet.textures[name + '_D1.png'], spriteSheet.textures[name + '_D2.png'], spriteSheet.textures[name + '_D3.png'], spriteSheet.textures[name + '_D4.png']];
-    this.animLeft = [spriteSheet.textures[name + '_L1.png'], spriteSheet.textures[name + '_L2.png'], spriteSheet.textures[name + '_L3.png'], spriteSheet.textures[name + '_L4.png']];
-    this.animRight = [spriteSheet.textures[name + '_R1.png'], spriteSheet.textures[name + '_R2.png'], spriteSheet.textures[name + '_R3.png'], spriteSheet.textures[name + '_R4.png']];
-    this.animUp = [spriteSheet.textures[name + '_U1.png'], spriteSheet.textures[name + '_U2.png'], spriteSheet.textures[name + '_U3.png'], spriteSheet.textures[name + '_U4.png']];
+    this.animDown = [new PIXI.Texture(texture, new PIXI.Rectangle(0, 0, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(32, 0, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(64, 0, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(96, 0, 32, 48))];
+    this.animLeft = [new PIXI.Texture(texture, new PIXI.Rectangle(0, 48, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(32, 48, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(64, 48, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(96, 48, 32, 48))];
+    this.animRight = [new PIXI.Texture(texture, new PIXI.Rectangle(0, 96, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(32, 96, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(64, 96, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(96, 96, 32, 48))];
+    this.animUp = [new PIXI.Texture(texture, new PIXI.Rectangle(0, 144, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(32, 144, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(64, 144, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(96, 144, 32, 48))];
 
     this.sprite = new PIXI.AnimatedSprite(this.animDown);
     this.sprite.anchor.set(0.5, 1);
