@@ -54,6 +54,7 @@ class Player extends Entity {
 
     this.speed = 0.05;
     this.movementKeys = [];
+    this.paralyzed = false;
   }
 
   update(delta) {
@@ -81,7 +82,17 @@ class Player extends Entity {
     this.sprite.position.y += gridHeight * 0.875;
   }
 
+  paralyze() {
+    this.movementKeys = [];
+    this.paralyzed = true;
+  }
+
+  unparalyze() {
+    this.paralyzed = false;
+  }
+
   keyDown(key) {
+    if (this.paralyzed) return;
     if (key == 'ArrowLeft' || key == 'ArrowRight' || key == 'ArrowUp' || key == 'ArrowDown') {
       if (this.movementKeys.indexOf(key) != -1) return;
       this.movementKeys.unshift(key);

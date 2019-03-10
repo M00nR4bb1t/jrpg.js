@@ -97,6 +97,129 @@ class TextboxEvent extends Event {
   }
 }
 
+class SelectionEvent extends Event {
+  constructor(message, options, name='', selection=0) {
+    super();
+    this.container = new PIXI.Container();
+    this.message = message;
+    this.options = options;
+    
+    this.graphics = new PIXI.Graphics();
+    this.container.addChild(this.graphics);
+
+    if (name != '') {
+      var nameText = new PIXI.Text(name, new PIXI.TextStyle({
+        fontFamily: 'Raleway',
+        fontSize: 18,
+        fontWeight: 600,
+        fill: '#FFFFFF',
+        wordWrap: true,
+        wordWrapWidth: 524
+      }));
+      nameText.x = 10;
+      nameText.y = 260;
+      this.container.addChild(nameText);
+    }
+
+    this.text = new PIXI.Text('', new PIXI.TextStyle({
+      fontFamily: 'Raleway',
+      fontSize: 18,
+      fontWeight: 200,
+      fill: '#FFFFFF',
+      wordWrap: true,
+      wordWrapWidth: 524
+    }));
+    this.text.x = 10;
+    this.text.y = 280;
+    this.container.addChild(this.text);
+
+    var optionTextStyle = new PIXI.TextStyle({
+      fontFamily: 'Raleway',
+      fontSize: 16,
+      fontWeight: 200,
+      fill: '#FFFFFF',
+      wordWrap: true,
+      wordWrapWidth: 524
+    });
+
+    var temp;
+    for (var i=0; i<options.length; i++) {
+      temp = new PIXI.Text(options[i].text, optionTextStyle);
+      temp.x = 408;
+      temp.y = 252 + 24 * (i - options.length);
+      this.container.addChild(temp);
+    }
+    
+    this.container.visible = false;
+    app.stage.addChild(this.container);
+  }
+
+  play(trigger) {
+    super.play(trigger);
+    
+    this.reveal = 0;
+    this.timer = 0;
+    this.selection = 0;
+    this.text.text = '';
+    
+    this.redraw();
+    this.container.visible = true;
+  }
+
+  update(delta) {
+    if (this.reveal == this.message.length) return;
+    this.timer += delta;
+    if (this.timer >= 3) {
+      this.timer = 0;
+
+      this.reveal ++;
+      this.text.text = this.message.substring(0, this.reveal);
+
+      var charAt = this.message.charAt(this.reveal - 1);
+      if (charAt != ' ' &&
+          charAt != '-') {
+        PIXI.Loader.shared.resources['res/se/voice.wav'].sound.play();
+      }
+    }
+  }
+
+  redraw() {
+    this.graphics.clear();
+    this.graphics.beginFill(0x555555, 0.5);
+    this.graphics.drawRect(0, 250, 544, 166);
+    for (var i=0; i<this.options.length; i++) {
+      if (i == this.selection) continue;
+      this.graphics.drawRect(400, 250 + 24 * (i - this.options.length), 144, 22);
+    }
+    this.graphics.endFill();
+
+    this.graphics.beginFill(0x888888, 0.5);
+    this.graphics.drawRect(400, 250 + 24 * (this.selection - this.options.length), 144, 22);
+    this.graphics.endFill();
+  }
+
+  keyDown(key) {
+    if (key == 'KeyZ') {
+      if (this.reveal == this.message.length) {
+        this.container.visible = false;
+        this.trigger.goto(this.options[this.selection].channel);
+      } else {
+        this.reveal = this.message.length;
+        this.text.text = this.message.substring(0, this.reveal);
+      }
+    } else if (key == 'ArrowUp') {
+      this.selection --;
+      while (this.selection < 0) {
+        this.selection = this.options.length + this.selection;
+      }
+      this.redraw();
+    } else if (key == 'ArrowDown') {
+      this.selection = (this.selection + 1) % this.options.length;
+      this.redraw();
+    }
+  }
+}
+
 class DelayEvent extends Event {
   constructor(time) {
     super();
@@ -117,43 +240,51 @@ class DelayEvent extends Event {
 }
 
 class Trigger extends Entity {
-  constructor(container, gridX, gridY, texture, eventTree) {
+  constructor(container, gridX, gridY, texture, eventStream) {
     super(container, gridX, gridY, new PIXI.Sprite(texture));
-    this.eventTree = eventTree;
+    this.eventStream = eventStream;
     this.playing = false;
   }
 
-  play(branch = 'main', index = 0) {
-    this.branch = branch;
+  play(channel = 'main', index = 0) {
+    this.channel = channel;
     this.index = index;
-    this.eventTree[this.branch][this.index].play(this);
+    this.eventStream[this.channel][this.index].play(this);
     this.playing = true;
   }
 
   done() {
-    if (this.index < this.eventTree[this.branch].length - 1) {
+    if (this.index < this.eventStream[this.channel].length - 1) {
       this.index++;
-      this.eventTree[this.branch][this.index].play(this);
-    } else this.playing = false;
+      this.eventStream[this.channel][this.index].play(this);
+    } else {
+      this.playing = false;
+      player.unparalyze();
+    }
+  }
+
+  goto(channel) {
+    this.play(channel);
   }
 
   update(delta) {
-    if (this.playing) this.eventTree[this.branch][this.index].update(delta);
+    if (this.playing) this.eventStream[this.channel][this.index].update(delta);
   }
 
   keyDown(key) {
     if (!this.playing && key == 'KeyZ') {
-      if (player.gridX + (player.moveX > 0)?1:0 == this.gridX && player.gridY + (player.moveY > 0)?1:0 == this.gridY) {
+      if (player.gridX + ((player.moveX > 0)?1:0) == this.gridX && player.gridY + ((player.moveY > 0)?1:0) == this.gridY) {
+        player.paralyze();
         this.play();
       }
     } else if (this.playing) {
-      this.eventTree[this.branch][this.index].keyDown(key);
+      this.eventStream[this.channel][this.index].keyDown(key);
     }
   }
 
   keyUp(key) {
     if (this.playing) {
-      this.eventTree[this.branch][this.index].keyUp(key);
+      this.eventStream[this.channel][this.index].keyUp(key);
     }
   }
 }

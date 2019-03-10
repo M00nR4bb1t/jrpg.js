@@ -31,6 +31,20 @@ function setup() {
     ]
   }));
 
+  triggers.push(new Trigger(app.stage, 10, 5, tileset[281], {
+    'main':[
+      new TextboxEvent('A tree stump. There is an axe stuck in it.'),
+      new SelectionEvent('Take out the axe?', [{'text': 'Yes', 'channel': 'takeAxe'}, {'text': 'No','channel': 'dontTakeAxe'}])
+    ],
+    'takeAxe':[
+      new DelayEvent(120),
+      new TextboxEvent('You try to take out the axe, but it is embeded too deeply into the stump.')
+    ],
+    'dontTakeAxe':[
+      new TextboxEvent('Yeah, I don\'t think I\'ll need an axe anytime soon...', 'Player')
+    ]
+  }));
+
   player = new Player(app.stage, 0, 0, PIXI.Loader.shared.resources['res/characters/tremel.png'].texture);
 
   app.ticker.add(delta => update(delta));
