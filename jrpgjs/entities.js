@@ -54,8 +54,6 @@ class Player extends Entity {
 
     this.speed = 0.05;
     this.movementKeys = [];
-
-    this.searching = false;
   }
 
   update(delta) {
@@ -78,15 +76,6 @@ class Player extends Entity {
       }
     }
 
-    if (this.searching) {
-      for (var i=0; i<triggers.length; i++) {
-        if (this.gridX + (this.moveX > 0)?1:0 == triggers[i].gridX && this.gridY + (this.moveY > 0)?1:0 == triggers[i].gridY) {
-          triggers[i].play();
-        }
-      }
-      this.searching = false;
-    }
-
     super.update(delta);
     this.sprite.position.x += gridWidth / 2;
     this.sprite.position.y += gridHeight * 0.875;
@@ -96,8 +85,6 @@ class Player extends Entity {
     if (key == 'ArrowLeft' || key == 'ArrowRight' || key == 'ArrowUp' || key == 'ArrowDown') {
       if (this.movementKeys.indexOf(key) != -1) return;
       this.movementKeys.unshift(key);
-    } else if (key == 'KeyZ') {
-      this.searching = true;
     }
   }
 
