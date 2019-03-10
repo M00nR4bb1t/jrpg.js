@@ -1,13 +1,17 @@
 class Entity {
-  constructor(x, y, sprite) {
-    this.x = x;
-    this.y = y;
-    this.gridX = Math.floor(x / gridWidth);
-    this.gridY = Math.floor(y / gridHeight);
-    this.remX = x % gridWidth / gridWidth;
-    this.remY = y % gridHeight / gridHeight;
-
+  constructor(gridX, gridY, sprite) {
+    this.gridX = Math.floor(gridX);
+    this.gridY = Math.floor(gridY);
+    this.remX = gridX - this.gridX;
+    this.remY = gridY - this.gridY;
+    
     this.sprite = sprite;
+    this.x = (this.gridX + this.remX) * gridWidth;
+    this.y = (this.gridY + this.remY) * gridHeight;
+    if (sprite) {
+      this.sprite.x = this.x;
+      this.sprite.y = this.y;
+    }
 
     this.moveX = 0;
     this.moveY = 0;
@@ -23,14 +27,16 @@ class Entity {
 
     this.x = (this.gridX + this.remX) * gridWidth;
     this.y = (this.gridY + this.remY) * gridHeight;
-    this.sprite.x = this.x;
-    this.sprite.y = this.y;
+    if (sprite) {
+      this.sprite.x = this.x;
+      this.sprite.y = this.y;
+    }
   }
 }
 
 class Player extends Entity {
-  constructor(x, y, texture) {
-    super(x, y, null);
+  constructor(gridX, gridY, texture) {
+    super(gridX, gridY, null);
 
     this.animDown = [new PIXI.Texture(texture, new PIXI.Rectangle(0, 0, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(32, 0, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(64, 0, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(96, 0, 32, 48))];
     this.animLeft = [new PIXI.Texture(texture, new PIXI.Rectangle(0, 48, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(32, 48, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(64, 48, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(96, 48, 32, 48))];
@@ -40,6 +46,9 @@ class Player extends Entity {
     this.sprite = new PIXI.AnimatedSprite(this.animDown);
     this.sprite.anchor.set(0.5, 1);
     this.sprite.animationSpeed = 0.1;
+
+    this.sprite.x = this.x;
+    this.sprite.y = this.y;
 
     this.speed = 0.05;
     this.movementKeys = [];
