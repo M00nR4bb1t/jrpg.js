@@ -68,11 +68,19 @@ class TextboxEvent extends Event {
   }
 
   update(delta) {
+    if (this.reveal == this.message.length) return;
     this.timer += delta;
     if (this.timer >= 3) {
       this.timer = 0;
-      this.reveal = Math.min(this.message.length, this.reveal + 1);
+
+      this.reveal ++;
       this.text.text = this.message.substring(0, this.reveal);
+
+      var charAt = this.message.charAt(this.reveal - 1);
+      if (charAt != ' ' &&
+          charAt != '-') {
+        PIXI.Loader.shared.resources['res/se/voice.wav'].sound.play();
+      }
     }
   }
 

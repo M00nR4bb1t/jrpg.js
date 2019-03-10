@@ -10,6 +10,7 @@ window.addEventListener('resize', resize);
 resize();
 PIXI.Loader.shared.add('res/characters/tremel.png')
                   .add('res/tilesets/rmxp_tileset.png')
+                  .add('res/se/voice.wav')
                   .load(setup);
 
 var player;
