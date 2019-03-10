@@ -79,7 +79,7 @@ class Player extends Entity {
     if (this.searching) {
       for (var i=0; i<triggers.length; i++) {
         if (this.gridX + (this.moveX > 0)?1:0 == triggers[i].gridX && this.gridY + (this.moveY > 0)?1:0 == triggers[i].gridY) {
-          console.log(`triggers[${i}] triggered!`);
+          triggers[i].play();
         }
       }
       this.searching = false;
