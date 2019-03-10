@@ -21,8 +21,8 @@ class TextboxEvent extends Event {
 }
 
 class Trigger extends Entity {
-  constructor(gridX, gridY, texture) {
-    super(gridX, gridY, new PIXI.Sprite(texture));
+  constructor(container, gridX, gridY, texture) {
+    super(container, gridX, gridY, new PIXI.Sprite(texture));
     this.eventTree = {'main':[new TextboxEvent(this, 'I\'m just a patch of grass, nothing special about me.'), new TextboxEvent(this, '...Seriously, there\'s nothing to look at here.'), new TextboxEvent(this, 'Pl-please, go away...')]};
   }
 

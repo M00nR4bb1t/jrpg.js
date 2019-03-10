@@ -1,5 +1,5 @@
 class Entity {
-  constructor(gridX, gridY, sprite) {
+  constructor(container, gridX, gridY, sprite) {
     this.gridX = Math.floor(gridX);
     this.gridY = Math.floor(gridY);
     this.remX = gridX - this.gridX;
@@ -11,6 +11,7 @@ class Entity {
     if (this.sprite) {
       this.sprite.x = this.x;
       this.sprite.y = this.y;
+      container.addChild(this.sprite);
     }
 
     this.moveX = 0;
@@ -35,8 +36,8 @@ class Entity {
 }
 
 class Player extends Entity {
-  constructor(gridX, gridY, texture) {
-    super(gridX, gridY, null);
+  constructor(container, gridX, gridY, texture) {
+    super(container, gridX, gridY, null);
 
     this.animDown = [new PIXI.Texture(texture, new PIXI.Rectangle(0, 0, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(32, 0, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(64, 0, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(96, 0, 32, 48))];
     this.animLeft = [new PIXI.Texture(texture, new PIXI.Rectangle(0, 48, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(32, 48, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(64, 48, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(96, 48, 32, 48))];
@@ -49,6 +50,7 @@ class Player extends Entity {
 
     this.sprite.x = this.x;
     this.sprite.y = this.y;
+    container.addChild(this.sprite);
 
     this.speed = 0.05;
     this.movementKeys = [];
