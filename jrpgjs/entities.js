@@ -8,7 +8,7 @@ class Entity {
     this.sprite = sprite;
     this.x = (this.gridX + this.remX) * gridWidth;
     this.y = (this.gridY + this.remY) * gridHeight;
-    if (sprite) {
+    if (this.sprite) {
       this.sprite.x = this.x;
       this.sprite.y = this.y;
     }
@@ -27,7 +27,7 @@ class Entity {
 
     this.x = (this.gridX + this.remX) * gridWidth;
     this.y = (this.gridY + this.remY) * gridHeight;
-    if (sprite) {
+    if (this.sprite) {
       this.sprite.x = this.x;
       this.sprite.y = this.y;
     }
