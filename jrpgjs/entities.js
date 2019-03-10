@@ -19,10 +19,10 @@ class Entity {
 
   update(delta) {
     this.remX += this.moveX * delta;
-    while (this.remX > 1) {this.remX--; this.gridX++;}
+    while (this.remX >= 1) {this.remX--; this.gridX++;}
     while (this.remX < 0) {this.remX++; this.gridX--;}
     this.remY += this.moveY * delta;
-    while (this.remY > 1) {this.remY--; this.gridY++;}
+    while (this.remY >= 1) {this.remY--; this.gridY++;}
     while (this.remY < 0) {this.remY++; this.gridY--;}
 
     this.x = (this.gridX + this.remX) * gridWidth;
@@ -52,6 +52,8 @@ class Player extends Entity {
 
     this.speed = 0.05;
     this.movementKeys = [];
+
+    this.searching = false;
   }
 
   update(delta) {
@@ -61,7 +63,7 @@ class Player extends Entity {
       this.remY = Math.round(this.remY);
       this.moveX = ((this.movementKeys.indexOf('ArrowRight') == 0)?this.speed:0) - ((this.movementKeys.indexOf('ArrowLeft') == 0)?this.speed:0);
       this.moveY = ((this.movementKeys.indexOf('ArrowDown') == 0)?this.speed:0) - ((this.movementKeys.indexOf('ArrowUp') == 0)?this.speed:0);
-      
+
       var animKey = {'ArrowDown': this.animDown, 'ArrowLeft': this.animLeft, 'ArrowRight': this.animRight, 'ArrowUp': this.animUp};
       if (this.movementKeys.length > 0 && animKey[this.movementKeys[0]] != this.sprite.textures) {
         this.sprite.textures = animKey[this.movementKeys[0]];
@@ -74,19 +76,34 @@ class Player extends Entity {
       }
     }
 
+    if (this.searching) {
+      for (var i=0; i<triggers.length; i++) {
+        if (this.gridX + (this.moveX > 0)?1:0 == triggers[i].gridX && this.gridY + (this.moveY > 0)?1:0 == triggers[i].gridY) {
+          console.log(`triggers[${i}] triggered!`);
+        }
+      }
+      this.searching = false;
+    }
+
     super.update(delta);
     this.sprite.position.x += gridWidth / 2;
     this.sprite.position.y += gridHeight * 0.875;
   }
 
   keyDown(key) {
-    if (this.movementKeys.indexOf(key) != -1) return;
-    this.movementKeys.unshift(key);
+    if (key == 'ArrowLeft' || key == 'ArrowRight' || key == 'ArrowUp' || key == 'ArrowDown') {
+      if (this.movementKeys.indexOf(key) != -1) return;
+      this.movementKeys.unshift(key);
+    } else if (key == 'KeyZ') {
+      this.searching = true;
+    }
   }
 
   keyUp(key) {
-    this.movementKeys = this.movementKeys.filter(function(value, index, arr){
-      return value != key;
-    });
+    if (key == 'ArrowLeft' || key == 'ArrowRight' || key == 'ArrowUp' || key == 'ArrowDown') {
+      this.movementKeys = this.movementKeys.filter(function(value, index, arr){
+        return value != key;
+      });
+    }
   }
 }
