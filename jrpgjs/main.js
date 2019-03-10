@@ -20,7 +20,15 @@ function setup() {
   tileset = Tilemap.getTileset(PIXI.Loader.shared.resources['res/tilesets/rmxp_tileset.png'].texture);
   tilemap = new Tilemap(app.stage, tileset, [[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]], 17, 13);
 
-  triggers.push(new Trigger(app.stage, 5, 5, tileset[19], {'main':[new TextboxEvent('I\'m just a patch of grass, nothing special about me.', 'Patch of Grass'), new TextboxEvent('...Seriously, there\'s nothing to look at here.', 'Patch of Grass'), new TextboxEvent('Pl-please, go away...', 'Patch of Grass')]}));
+  triggers.push(new Trigger(app.stage, 5, 5, tileset[19], {
+    'main':[
+      new TextboxEvent('I\'m just a patch of grass, nothing special about me.', 'Patch of Grass'),
+      new DelayEvent(60),
+      new TextboxEvent('...Seriously, there\'s nothing to look at here.', 'Patch of Grass'),
+      new DelayEvent(120),
+      new TextboxEvent('Pl-please, go away...', 'Patch of Grass')
+    ]
+  }));
 
   player = new Player(app.stage, 0, 0, PIXI.Loader.shared.resources['res/characters/tremel.png'].texture);
 

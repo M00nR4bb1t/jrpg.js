@@ -1,6 +1,6 @@
 class Event {
-  play() {
-    //
+  play(trigger) {
+    this.trigger = trigger;
   }
 
   update(delta) {
@@ -59,8 +59,8 @@ class TextboxEvent extends Event {
   }
 
   play(trigger) {
-    this.trigger = trigger;
-
+    super.play(trigger);
+    
     this.container.visible = true;
     this.reveal = 0;
     this.timer = 0;
@@ -85,6 +85,25 @@ class TextboxEvent extends Event {
         this.reveal = this.message.length;
         this.text.text = this.message.substring(0, this.reveal);
       }
+    }
+  }
+}
+
+class DelayEvent extends Event {
+  constructor(time) {
+    super();
+    this.time = time;
+  }
+
+  play(trigger) {
+    super.play(trigger);
+    this.timer = 0;
+  }
+
+  update(delta) {
+    this.timer += delta;
+    if (this.timer >= this.time) {
+      this.trigger.done();
     }
   }
 }
