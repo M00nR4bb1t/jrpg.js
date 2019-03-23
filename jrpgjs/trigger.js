@@ -20,6 +20,7 @@ class TextboxEvent extends Event {
   constructor(message, name='') {
     super();
     this.container = new PIXI.Container();
+    this.container.z = Number.MAX_VALUE;
     this.message = message;
     
     var graphics = new PIXI.Graphics();
@@ -79,7 +80,7 @@ class TextboxEvent extends Event {
       var charAt = this.message.charAt(this.reveal - 1);
       if (charAt != ' ' &&
           charAt != '-') {
-        PIXI.Loader.shared.resources['res/se/voice.wav'].sound.play();
+        PIXI.Loader.shared.resources['voice'].sound.play();
       }
     }
   }
@@ -101,6 +102,7 @@ class SelectionEvent extends Event {
   constructor(message, options, name='', selection=0) {
     super();
     this.container = new PIXI.Container();
+    this.container.z = Number.MAX_VALUE;
     this.message = message;
     this.options = options;
     
@@ -178,7 +180,7 @@ class SelectionEvent extends Event {
       var charAt = this.message.charAt(this.reveal - 1);
       if (charAt != ' ' &&
           charAt != '-') {
-        PIXI.Loader.shared.resources['res/se/voice.wav'].sound.play();
+        PIXI.Loader.shared.resources['voice'].sound.play();
       }
     }
   }
@@ -240,8 +242,9 @@ class DelayEvent extends Event {
 }
 
 class Trigger extends Entity {
-  constructor(container, gridX, gridY, sprite, eventStream) {
+  constructor(container, gridX, gridY, sprite, isSolid, eventStream) {
     super(container, gridX, gridY, sprite);
+    solid[this.gridY][this.gridX] = isSolid || solid[this.gridY][this.gridX];
     this.eventStream = eventStream;
     this.playing = false;
   }
@@ -274,7 +277,10 @@ class Trigger extends Entity {
 
   keyDown(key) {
     if (!this.playing && key == 'KeyZ') {
-      if (player.gridX + ((player.moveX > 0)?1:0) == this.gridX && player.gridY + ((player.moveY > 0)?1:0) == this.gridY) {
+      if (
+        (player.gridX == this.gridX && player.gridY == this.gridY) ||
+        (player.desireX == this.gridX && player.desireY == this.gridY)
+      ) {
         player.paralyze();
         this.play();
       }
@@ -292,23 +298,22 @@ class Trigger extends Entity {
 
 class NPC extends Trigger {
   constructor(container, gridX, gridY, texture, eventStream) {
-    super(container, gridX, gridY, null, eventStream);
-    solid[this.gridY][this.gridX] = true;
+    super(container, gridX, gridY, null, true, eventStream);
 
     this.targetX = 0;
     this.targetY = 0;
 
-    this.animDown = [new PIXI.Texture(texture, new PIXI.Rectangle(0, 0, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(32, 0, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(64, 0, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(96, 0, 32, 48))];
-    this.animLeft = [new PIXI.Texture(texture, new PIXI.Rectangle(0, 48, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(32, 48, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(64, 48, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(96, 48, 32, 48))];
-    this.animRight = [new PIXI.Texture(texture, new PIXI.Rectangle(0, 96, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(32, 96, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(64, 96, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(96, 96, 32, 48))];
-    this.animUp = [new PIXI.Texture(texture, new PIXI.Rectangle(0, 144, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(32, 144, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(64, 144, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(96, 144, 32, 48))];
+    this.animDown = [new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0, texture.height * 0, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.25, texture.height * 0, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.5, texture.height * 0, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.75, texture.height * 0, texture.width * 0.25, texture.height * 0.25))];
+    this.animLeft = [new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0, texture.height * 0.25, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.25, texture.height * 0.25, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.5, texture.height * 0.25, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.75, texture.height * 0.25, texture.width * 0.25, texture.height * 0.25))];
+    this.animRight = [new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0, texture.height * 0.5, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.25, texture.height * 0.5, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.5, texture.height * 0.5, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.75, texture.height * 0.5, texture.width * 0.25, texture.height * 0.25))];
+    this.animUp = [new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0, texture.height * 0.75, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.25, texture.height * 0.75, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.5, texture.height * 0.75, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.75, texture.height * 0.75, texture.width * 0.25, texture.height * 0.25))];
 
     this.sprite = new PIXI.AnimatedSprite(this.animDown);
     this.sprite.anchor.set(0.5, 1);
     this.sprite.animationSpeed = 0.1;
 
     this.sprite.x = this.x;
-    this.sprite.y = this.y;
+    this.sprite.y = this.sprite.z = this.y;
     container.addChild(this.sprite);
 
     this.speed = 0.01;
@@ -341,7 +346,7 @@ class NPC extends Trigger {
         this.moveX = ((direction == 0)?this.speed:0) - ((direction == 1)?this.speed:0);
         this.moveY = ((direction == 2)?this.speed:0) - ((direction == 3)?this.speed:0);
 
-        if (this.gridX + this.moveX < 0 || this.gridY + this.moveY < 0 || solid[this.gridY + Math.sign(this.moveY)][this.gridX + Math.sign(this.moveX)]) {
+        if (this.gridX + Math.sign(this.moveX) < 0 || this.gridY + Math.sign(this.moveY) < 0 || this.gridX + Math.sign(this.moveX) >= tilemap.width || this.gridY + Math.sign(this.moveY) >= tilemap.height || solid[this.gridY + Math.sign(this.moveY)][this.gridX + Math.sign(this.moveX)]) {
           this.moveX = 0;
           this.moveY = 0;
         }
@@ -369,7 +374,10 @@ class NPC extends Trigger {
 
   keyDown(key) {
     if (!this.playing && key == 'KeyZ') {
-      if (player.desireX == this.gridX + ((this.moveX > 0)?1:0) && player.desireY == this.gridY + ((this.moveY > 0)?1:0)) {
+      if (
+        (player.gridX == this.gridX + ((this.moveX > 0)?1:0) && player.gridY == this.gridY + ((this.moveY > 0)?1:0)) ||
+        (player.desireX == this.gridX + ((this.moveX > 0)?1:0) && player.desireY == this.gridY + ((this.moveY > 0)?1:0))
+      ) {
         player.paralyze();
         this.play();
       }

@@ -8,9 +8,10 @@ document.addEventListener('keydown', keyDown);
 document.addEventListener('keyup', keyUp);
 window.addEventListener('resize', resize);
 resize();
-PIXI.Loader.shared.add('res/characters/tremel.png')
-                  .add('res/tilesets/rmxp_tileset.png')
-                  .add('res/se/voice.wav')
+PIXI.Loader.shared.add('tremel', 'res/characters/tremel.png')
+                  .add('joe', 'res/characters/joe.png')
+                  .add('cafe', 'res/tilesets/cafe.png')
+                  .add('voice', 'res/se/voice.wav')
                   .load(setup);
 
 var player;
@@ -20,37 +21,37 @@ var solid;
 
 var debug = true;
 var debugGraphics = new PIXI.Graphics();
+debugGraphics.z = 1000;
 
 function setup() {
-  tileset = Tilemap.getTileset(PIXI.Loader.shared.resources['res/tilesets/rmxp_tileset.png'].texture);
+  tileset = new Tileset(PIXI.Loader.shared.resources['cafe'].texture, [72]);
   tilemap = new Tilemap(app.stage, tileset, [[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]], 17, 13);
-  solid = [[false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false], [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false], [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false], [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false], [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false], [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false], [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false], [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false], [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false], [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false], [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false], [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false], [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false]];
+  solid = tilemap.solid;
 
-  triggers.push(new NPC(app.stage, 5, 5, PIXI.Loader.shared.resources['res/characters/tremel.png'].texture, {
+  triggers.push(new NPC(app.stage, 5, 5, PIXI.Loader.shared.resources['joe'].texture, {
     'main':[
-      new TextboxEvent('I\'m just a patch of grass, nothing special about me.', 'Patch of Grass'),
-      new DelayEvent(60),
-      new TextboxEvent('...Seriously, there\'s nothing to look at here.', 'Patch of Grass'),
-      new DelayEvent(120),
-      new TextboxEvent('Pl-please, go away...', 'Patch of Grass')
+      new TextboxEvent('Why, hello there, young man!', '???'),
+      new TextboxEvent('The name\'s Joe! Nice to meet you!', 'Joe'),
+      new DelayEvent(180),
+      new TextboxEvent('Well, I hope to see you around.', 'Joe')
     ]
   }));
 
-  triggers.push(new Trigger(app.stage, 10, 5, new PIXI.Sprite(tileset[281]), {
+  triggers.push(new Trigger(app.stage, 10, 5, new PIXI.Sprite(tileset.textures[72]), true, {
     'main':[
-      new TextboxEvent('A tree stump. There is an axe stuck in it.'),
-      new SelectionEvent('Take out the axe?', [{'text': 'Yes', 'channel': 'takeAxe'}, {'text': 'No','channel': 'dontTakeAxe'}])
+      new TextboxEvent('A tray of freshly-baked bread. Looks delicious!'),
+      new SelectionEvent('Take one?', [{'text': 'Yes', 'channel': 'takeBread'}, {'text': 'No','channel': 'dontTakeBread'}])
     ],
-    'takeAxe':[
+    'takeBread':[
       new DelayEvent(120),
-      new TextboxEvent('You try to take out the axe, but it is embeded too deeply into the stump.')
+      new TextboxEvent('Actually, I probably shouldn\'t take this. Stealing is bad.', 'Tremel')
     ],
-    'dontTakeAxe':[
-      new TextboxEvent('Yeah, I don\'t think I\'ll need an axe anytime soon...', 'Player')
+    'dontTakeBread':[
+      new TextboxEvent('Yeah, stealing is bad.', 'Tremel')
     ]
   }));
 
-  player = new Player(app.stage, 0, 0, PIXI.Loader.shared.resources['res/characters/tremel.png'].texture);
+  player = new Player(app.stage, 0, 0, PIXI.Loader.shared.resources['tremel'].texture);
 
   app.stage.addChild(debugGraphics);
   app.ticker.add(delta => update(delta));
@@ -64,6 +65,10 @@ function update(delta) {
     triggers[i].update(delta);
   }
 
+  app.stage.children.sort(function (a, b) {
+    return a.z - b.z;
+  });
+
   if (!debug) return;
   debugGraphics.beginFill(0xFF0000, 0.5);
   for (var y=0; y<solid.length; y++) {
@@ -76,7 +81,7 @@ function update(delta) {
   debugGraphics.endFill();
 }
 
-function debugMode(x) {
+function setDebug(x) {
   debug = debugGraphics.visible = x;
 }
 

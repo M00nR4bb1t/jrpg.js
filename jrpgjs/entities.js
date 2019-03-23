@@ -10,8 +10,21 @@ class Entity {
     this.y = (this.gridY + this.remY) * gridHeight;
     if (this.sprite) {
       this.sprite.x = this.x;
-      this.sprite.y = this.y;
+      this.sprite.y = this.sprite.z = this.y;
       container.addChild(this.sprite);
+
+      this.zText = new PIXI.Text(`${this.sprite.z.toString(10)}\n${app.stage.children.indexOf(this.sprite)}`, new PIXI.TextStyle({
+        fontFamily: 'Raleway',
+        fontSize: 12,
+        fontWeight: 300,
+        fill: '#FFFFFF',
+        wordWrap: true,
+        wordWrapWidth: 524
+      }));
+
+      this.zText.x = this.x;
+      this.zText.y = this.y;
+      debugGraphics.addChild(this.zText);
     }
 
     this.moveX = 0;
@@ -30,7 +43,25 @@ class Entity {
     this.y = (this.gridY + this.remY) * gridHeight;
     if (this.sprite) {
       this.sprite.x = this.x;
-      this.sprite.y = this.y;
+      this.sprite.y = this.sprite.z = this.y;
+      if (this.zText) {
+        this.zText.text = `${this.sprite.z.toString(10)}\n${app.stage.children.indexOf(this.sprite)}`;
+        this.zText.x = this.x;
+        this.zText.y = this.y;
+      } else {
+        this.zText = new PIXI.Text(`${this.sprite.z.toString(10)}\n${app.stage.children.indexOf(this.sprite)}`, new PIXI.TextStyle({
+          fontFamily: 'Raleway',
+          fontSize: 12,
+          fontWeight: 300,
+          fill: '#FFFFFF',
+          wordWrap: true,
+          wordWrapWidth: 524
+        }));
+
+        this.zText.x = this.x;
+        this.zText.y = this.y;
+        debugGraphics.addChild(this.zText);
+      }
     }
   }
 }
@@ -42,17 +73,17 @@ class Player extends Entity {
     this.desireX = 0;
     this.desireY = 0;
 
-    this.animDown = [new PIXI.Texture(texture, new PIXI.Rectangle(0, 0, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(32, 0, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(64, 0, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(96, 0, 32, 48))];
-    this.animLeft = [new PIXI.Texture(texture, new PIXI.Rectangle(0, 48, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(32, 48, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(64, 48, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(96, 48, 32, 48))];
-    this.animRight = [new PIXI.Texture(texture, new PIXI.Rectangle(0, 96, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(32, 96, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(64, 96, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(96, 96, 32, 48))];
-    this.animUp = [new PIXI.Texture(texture, new PIXI.Rectangle(0, 144, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(32, 144, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(64, 144, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(96, 144, 32, 48))];
+    this.animDown = [new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0, texture.height * 0, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.25, texture.height * 0, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.5, texture.height * 0, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.75, texture.height * 0, texture.width * 0.25, texture.height * 0.25))];
+    this.animLeft = [new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0, texture.height * 0.25, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.25, texture.height * 0.25, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.5, texture.height * 0.25, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.75, texture.height * 0.25, texture.width * 0.25, texture.height * 0.25))];
+    this.animRight = [new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0, texture.height * 0.5, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.25, texture.height * 0.5, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.5, texture.height * 0.5, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.75, texture.height * 0.5, texture.width * 0.25, texture.height * 0.25))];
+    this.animUp = [new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0, texture.height * 0.75, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.25, texture.height * 0.75, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.5, texture.height * 0.75, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.75, texture.height * 0.75, texture.width * 0.25, texture.height * 0.25))];
 
     this.sprite = new PIXI.AnimatedSprite(this.animDown);
     this.sprite.anchor.set(0.5, 1);
     this.sprite.animationSpeed = 0.1;
 
     this.sprite.x = this.x;
-    this.sprite.y = this.y;
+    this.sprite.y = this.sprite.z = this.y;
     container.addChild(this.sprite);
 
     this.speed = 0.05;
@@ -77,7 +108,7 @@ class Player extends Entity {
       this.desireX = this.gridX + Math.sign(this.moveX);
       this.desireY = this.gridY + Math.sign(this.moveY);
 
-      if (this.gridX + this.moveX < 0 || this.gridY + this.gridY < 0 || solid[this.gridY + Math.sign(this.moveY)][this.gridX + Math.sign(this.moveX)]) {
+      if (this.desireX < 0 || this.desireY < 0 || this.desireX >= tilemap.width || this.desireY >= tilemap.height || solid[this.gridY + Math.sign(this.moveY)][this.gridX + Math.sign(this.moveX)]) {
         this.moveX = 0;
         this.moveY = 0;
       }
