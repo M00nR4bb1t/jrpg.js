@@ -240,8 +240,8 @@ class DelayEvent extends Event {
 }
 
 class Trigger extends Entity {
-  constructor(container, gridX, gridY, texture, eventStream) {
-    super(container, gridX, gridY, new PIXI.Sprite(texture));
+  constructor(container, gridX, gridY, sprite, eventStream) {
+    super(container, gridX, gridY, sprite);
     this.eventStream = eventStream;
     this.playing = false;
   }
@@ -269,6 +269,7 @@ class Trigger extends Entity {
 
   update(delta) {
     if (this.playing) this.eventStream[this.channel][this.index].update(delta);
+    super.update(delta);
   }
 
   keyDown(key) {
@@ -285,6 +286,95 @@ class Trigger extends Entity {
   keyUp(key) {
     if (this.playing) {
       this.eventStream[this.channel][this.index].keyUp(key);
+    }
+  }
+}
+
+class NPC extends Trigger {
+  constructor(container, gridX, gridY, texture, eventStream) {
+    super(container, gridX, gridY, null, eventStream);
+    solid[this.gridY][this.gridX] = true;
+
+    this.targetX = 0;
+    this.targetY = 0;
+
+    this.animDown = [new PIXI.Texture(texture, new PIXI.Rectangle(0, 0, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(32, 0, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(64, 0, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(96, 0, 32, 48))];
+    this.animLeft = [new PIXI.Texture(texture, new PIXI.Rectangle(0, 48, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(32, 48, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(64, 48, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(96, 48, 32, 48))];
+    this.animRight = [new PIXI.Texture(texture, new PIXI.Rectangle(0, 96, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(32, 96, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(64, 96, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(96, 96, 32, 48))];
+    this.animUp = [new PIXI.Texture(texture, new PIXI.Rectangle(0, 144, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(32, 144, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(64, 144, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(96, 144, 32, 48))];
+
+    this.sprite = new PIXI.AnimatedSprite(this.animDown);
+    this.sprite.anchor.set(0.5, 1);
+    this.sprite.animationSpeed = 0.1;
+
+    this.sprite.x = this.x;
+    this.sprite.y = this.y;
+    container.addChild(this.sprite);
+
+    this.speed = 0.01;
+  }
+
+  update(delta) {
+    if (Math.abs(Math.round(this.remX) - this.remX) < this.speed && Math.abs(Math.round(this.remY) - this.remY) < this.speed) {
+      this.remX = Math.round(this.remX);
+      this.remY = Math.round(this.remY);
+
+      while (this.remX >= 1) {this.remX--; this.gridX++;}
+      while (this.remX < 0) {this.remX++; this.gridX--;}
+      while (this.remY >= 1) {this.remY--; this.gridY++;}
+      while (this.remY < 0) {this.remY++; this.gridY--;}
+      
+      if (this.playing) {
+        this.moveX = 0;
+        this.moveY = 0;
+
+        if (player.gridX < this.gridX) this.sprite.textures = this.animLeft;
+        else if (player.gridX > this.gridX) this.sprite.textures = this.animRight;
+        else if (player.gridY < this.gridY) this.sprite.textures = this.animUp;
+        else this.sprite.textures = this.animDown;
+
+        this.sprite.gotoAndStop(0);
+      } else {
+        var moveXPrev = this.moveX, moveYPrev = this.moveY, framePrev = this.sprite.currentFrame;
+        var direction = Math.choose(0, 1, 2, 3); // Right, Left, Down, Up
+
+        this.moveX = ((direction == 0)?this.speed:0) - ((direction == 1)?this.speed:0);
+        this.moveY = ((direction == 2)?this.speed:0) - ((direction == 3)?this.speed:0);
+
+        if (this.gridX + this.moveX < 0 || this.gridY + this.moveY < 0 || solid[this.gridY + Math.sign(this.moveY)][this.gridX + Math.sign(this.moveX)]) {
+          this.moveX = 0;
+          this.moveY = 0;
+        }
+
+        var animKey = {2: this.animDown, 1: this.animLeft, 0: this.animRight, 3: this.animUp};
+        if (animKey[direction] != this.sprite.textures) {
+          this.sprite.textures = animKey[direction];
+        }
+
+        if (this.moveX == 0 && this.moveY == 0) {
+          this.sprite.gotoAndStop(0);
+        } else if (this.moveX != moveXPrev || this.moveY != moveYPrev) {
+          this.sprite.gotoAndPlay(framePrev + 1);
+        }
+      }
+
+      solid[this.gridY][this.gridX] = false;
+      solid[this.gridY + Math.sign(this.moveY)][this.gridX + Math.sign(this.moveX)] = true;
+    }
+
+    super.update(delta);
+    this.sprite.position.x += gridWidth / 2;
+    this.sprite.position.y += gridHeight * 0.875;
+  }
+
+  keyDown(key) {
+    if (!this.playing && key == 'KeyZ') {
+      if (player.desireX == this.gridX + ((this.moveX > 0)?1:0) && player.desireY == this.gridY + ((this.moveY > 0)?1:0)) {
+        player.paralyze();
+        this.play();
+      }
+    } else if (this.playing) {
+      this.eventStream[this.channel][this.index].keyDown(key);
     }
   }
 }

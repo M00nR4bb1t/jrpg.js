@@ -39,6 +39,9 @@ class Player extends Entity {
   constructor(container, gridX, gridY, texture) {
     super(container, gridX, gridY, null);
 
+    this.desireX = 0;
+    this.desireY = 0;
+
     this.animDown = [new PIXI.Texture(texture, new PIXI.Rectangle(0, 0, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(32, 0, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(64, 0, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(96, 0, 32, 48))];
     this.animLeft = [new PIXI.Texture(texture, new PIXI.Rectangle(0, 48, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(32, 48, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(64, 48, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(96, 48, 32, 48))];
     this.animRight = [new PIXI.Texture(texture, new PIXI.Rectangle(0, 96, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(32, 96, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(64, 96, 32, 48)), new PIXI.Texture(texture, new PIXI.Rectangle(96, 96, 32, 48))];
@@ -62,8 +65,25 @@ class Player extends Entity {
       var moveXPrev = this.moveX, moveYPrev = this.moveY, framePrev = this.sprite.currentFrame;
       this.remX = Math.round(this.remX);
       this.remY = Math.round(this.remY);
+
+      while (this.remX >= 1) {this.remX--; this.gridX++;}
+      while (this.remX < 0) {this.remX++; this.gridX--;}
+      while (this.remY >= 1) {this.remY--; this.gridY++;}
+      while (this.remY < 0) {this.remY++; this.gridY--;}
+
       this.moveX = ((this.movementKeys.indexOf('ArrowRight') == 0)?this.speed:0) - ((this.movementKeys.indexOf('ArrowLeft') == 0)?this.speed:0);
       this.moveY = ((this.movementKeys.indexOf('ArrowDown') == 0)?this.speed:0) - ((this.movementKeys.indexOf('ArrowUp') == 0)?this.speed:0);
+      
+      this.desireX = this.gridX + Math.sign(this.moveX);
+      this.desireY = this.gridY + Math.sign(this.moveY);
+
+      if (this.gridX + this.moveX < 0 || this.gridY + this.gridY < 0 || solid[this.gridY + Math.sign(this.moveY)][this.gridX + Math.sign(this.moveX)]) {
+        this.moveX = 0;
+        this.moveY = 0;
+      }
+
+      solid[this.gridY][this.gridX] = false;
+      solid[this.gridY + Math.sign(this.moveY)][this.gridX + Math.sign(this.moveX)] = true;
 
       var animKey = {'ArrowDown': this.animDown, 'ArrowLeft': this.animLeft, 'ArrowRight': this.animRight, 'ArrowUp': this.animUp};
       if (this.movementKeys.length > 0 && animKey[this.movementKeys[0]] != this.sprite.textures) {
@@ -75,6 +95,12 @@ class Player extends Entity {
       } else if (this.moveX != moveXPrev || this.moveY != moveYPrev) {
         this.sprite.gotoAndPlay(framePrev + 1);
       }
+    }
+
+    if (debug) {
+      debugGraphics.beginFill(0x0000FF, 0.5);
+      debugGraphics.drawCircle(this.desireX * gridWidth + gridWidth / 2, this.desireY * gridHeight + gridHeight / 2, gridWidth / 4);
+      debugGraphics.endFill();
     }
 
     super.update(delta);

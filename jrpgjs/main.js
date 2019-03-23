@@ -16,12 +16,17 @@ PIXI.Loader.shared.add('res/characters/tremel.png')
 var player;
 var tileset, tilemap;
 var triggers = [];
+var solid;
+
+var debug = true;
+var debugGraphics = new PIXI.Graphics();
 
 function setup() {
   tileset = Tilemap.getTileset(PIXI.Loader.shared.resources['res/tilesets/rmxp_tileset.png'].texture);
   tilemap = new Tilemap(app.stage, tileset, [[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]], 17, 13);
+  solid = [[false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false], [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false], [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false], [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false], [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false], [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false], [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false], [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false], [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false], [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false], [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false], [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false], [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false]];
 
-  triggers.push(new Trigger(app.stage, 5, 5, tileset[19], {
+  triggers.push(new NPC(app.stage, 5, 5, PIXI.Loader.shared.resources['res/characters/tremel.png'].texture, {
     'main':[
       new TextboxEvent('I\'m just a patch of grass, nothing special about me.', 'Patch of Grass'),
       new DelayEvent(60),
@@ -31,7 +36,7 @@ function setup() {
     ]
   }));
 
-  triggers.push(new Trigger(app.stage, 10, 5, tileset[281], {
+  triggers.push(new Trigger(app.stage, 10, 5, new PIXI.Sprite(tileset[281]), {
     'main':[
       new TextboxEvent('A tree stump. There is an axe stuck in it.'),
       new SelectionEvent('Take out the axe?', [{'text': 'Yes', 'channel': 'takeAxe'}, {'text': 'No','channel': 'dontTakeAxe'}])
@@ -47,14 +52,32 @@ function setup() {
 
   player = new Player(app.stage, 0, 0, PIXI.Loader.shared.resources['res/characters/tremel.png'].texture);
 
+  app.stage.addChild(debugGraphics);
   app.ticker.add(delta => update(delta));
 }
 
 function update(delta) {
+  if (debug) debugGraphics.clear(); 
+
   player.update(delta);
   for (var i=0; i<triggers.length; i++) {
     triggers[i].update(delta);
   }
+
+  if (!debug) return;
+  debugGraphics.beginFill(0xFF0000, 0.5);
+  for (var y=0; y<solid.length; y++) {
+    for (var x=0; x<solid[y].length; x++) {
+      if (solid[y][x]) {
+        debugGraphics.drawRect(x * gridWidth, y * gridHeight, gridWidth, gridHeight);
+      }
+    }
+  }
+  debugGraphics.endFill();
+}
+
+function debugMode(x) {
+  debug = debugGraphics.visible = x;
 }
 
 function keyDown(e) {
