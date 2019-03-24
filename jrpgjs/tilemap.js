@@ -12,7 +12,6 @@ class Tileset {
 
 class Tilemap {
   constructor(container, tileset, layers, width, height) {
-    this.graphics = new PIXI.Graphics();
     this.tileset = tileset;
     this.width = width;
     this.height = height;
@@ -41,7 +40,9 @@ class Tilemap {
 
     this.brt = new PIXI.BaseRenderTexture(width * gridWidth, height * gridHeight, PIXI.SCALE_MODES.LINEAR, 1);
     this.rt = new PIXI.RenderTexture(this.brt);
-    container.addChild(new PIXI.Sprite(this.rt));
+    var sprite = new PIXI.Sprite(this.rt);
+    sprite.z = 0;
+    container.addChild(sprite);
     this.draw();
   }
 

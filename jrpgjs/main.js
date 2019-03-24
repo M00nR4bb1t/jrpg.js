@@ -26,7 +26,9 @@ app.stage.addChild(viewport);
 
 var debug = true;
 var debugGraphics = new PIXI.Graphics();
-debugGraphics.z = 1000;
+debugGraphics.z = Number.MAX_VALUE;
+viewport.addChild(debugGraphics);
+
 
 function zSort(a, b) {
   return a.z - b.z;
@@ -59,11 +61,8 @@ function setup() {
       new TextboxEvent('Yeah, stealing is bad.', 'Tremel')
     ]
   }));
-
+  
   player = new Player(viewport, 0, 0, PIXI.Loader.shared.resources['tremel'].texture);
-
-  viewport.addChild(debugGraphics);
-  app.ticker.add(delta => update(delta));
 
   minFPS = app.ticker.FPS;
   fpsText = new PIXI.Text(`${app.ticker.FPS}\n${minFPS}`, new PIXI.TextStyle({
@@ -75,6 +74,8 @@ function setup() {
     wordWrapWidth: 524
   }));
   debugGraphics.addChild(fpsText);
+
+  app.ticker.add(delta => update(delta));
 }
 
 function update(delta) {
