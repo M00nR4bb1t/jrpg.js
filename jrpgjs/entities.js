@@ -118,7 +118,7 @@ class Player extends Entity {
 
       if (this.moveX == 0 && this.moveY == 0) {
         this.sprite.gotoAndStop(0);
-      } else if (this.sprite.textures != animPrev) {
+      } else if (this.sprite.textures != animPrev || !this.sprite.playing) {
         this.sprite.gotoAndPlay(framePrev + 1);
       }
     } else if (Math.abs(Math.round(this.remX) - this.remX) < this.speed * deltaPrev && Math.abs(Math.round(this.remY) - this.remY) < this.speed * deltaPrev) {

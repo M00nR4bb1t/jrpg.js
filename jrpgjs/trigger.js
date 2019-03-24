@@ -348,7 +348,7 @@ class NPC extends Trigger {
 
         if (this.moveX == 0 && this.moveY == 0) {
           this.sprite.gotoAndStop(0);
-        } else if (this.sprite.textures != animPrev) {
+        } else if (this.sprite.textures != animPrev || !this.sprite.playing) {
           this.sprite.gotoAndPlay(framePrev + 1);
         }
       }
