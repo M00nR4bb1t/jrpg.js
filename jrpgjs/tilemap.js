@@ -21,7 +21,7 @@ class Tilemap {
     for (var y=0; y<height; y++) {
       this.solid.push([]);
       for (var x=0; x<width; x++) {
-        this.solid[y].push(false);
+        this.solid[y].push([false, false, false, false]);
       }
     }
 
@@ -29,11 +29,12 @@ class Tilemap {
       for (var y=0; y<height; y++) {
         for (var x=0; x<width; x++) {
           var tile = layers[z][y][x];
+          if (tile == -1) continue;
           var sprite = new PIXI.Sprite(this.tileset.textures[tile]);
           sprite.x = x * gridWidth;
           sprite.y = y * gridHeight;
           this.container.addChild(sprite);
-          this.solid[y][x] = (this.tileset.solidTiles.indexOf(tile) != -1) || this.solid[y][x];
+          if (tileset.solidTiles[tile]) this.solid[y][x] = [this.solid[y][x][0] || tileset.solidTiles[tile][0], this.solid[y][x][1] || tileset.solidTiles[tile][1], this.solid[y][x][2] || tileset.solidTiles[tile][2], this.solid[y][x][3] || tileset.solidTiles[tile][3]];
         }
       }
     }

@@ -246,7 +246,7 @@ class DelayEvent extends Event {
 class Trigger extends Entity {
   constructor(container, gridX, gridY, sprite, isSolid, eventStream) {
     super(container, gridX, gridY, sprite);
-    solid[this.gridY][this.gridX] = isSolid || solid[this.gridY][this.gridX];
+    solid[this.gridY][this.gridX] = isSolid;
     this.eventStream = eventStream;
     this.playing = false;
   }
@@ -300,7 +300,7 @@ class Trigger extends Entity {
 
 class NPC extends Trigger {
   constructor(container, gridX, gridY, texture, eventStream) {
-    super(container, gridX, gridY, null, true, eventStream);
+    super(container, gridX, gridY, null, [true, true, true, true], eventStream);
 
     this.targetX = gridX;
     this.targetY = gridY;
@@ -332,20 +332,22 @@ class NPC extends Trigger {
         this.sprite.gotoAndStop(0);
       } else {
         var animPrev = this.sprite.textures, framePrev = this.sprite.currentFrame;
+
+        solid[this.targetY][this.targetX] = tilemap.solid[this.targetY][this.targetX];
+        
         do {
           var direction = Math.choose(0, 1, 2, 3); // Right, Left, Down, Up
           this.moveX = ((direction == 0)?this.speed:0) - ((direction == 1)?this.speed:0);
           this.moveY = ((direction == 2)?this.speed:0) - ((direction == 3)?this.speed:0);
-        } while (this.gridX + Math.sign(this.moveX) < 0 || this.gridY + Math.sign(this.moveY) < 0 || this.gridX + Math.sign(this.moveX) >= tilemap.width || this.gridY + Math.sign(this.moveY) >= tilemap.height || solid[this.gridY + Math.sign(this.moveY)][this.gridX + Math.sign(this.moveX)])
+        } while (this.gridX + Math.sign(this.moveX) < 0 || this.gridY + Math.sign(this.moveY) < 0 || this.gridX + Math.sign(this.moveX) >= tilemap.width || this.gridY + Math.sign(this.moveY) >= tilemap.height || solid[this.gridY][this.gridX][direction] || solid[this.gridY + Math.sign(this.moveY)][this.gridX + Math.sign(this.moveX)][3 - direction])
 
-        solid[this.targetY][this.targetX] = false;
         this.targetX = this.gridX + Math.sign(this.moveX);
         this.targetY = this.gridY + Math.sign(this.moveY);
-        solid[this.targetY][this.targetX] = true;
+        solid[this.targetY][this.targetX] = [true, true, true, true];
 
-        var animKey = {2: this.animDown, 1: this.animLeft, 0: this.animRight, 3: this.animUp};
-        if (animKey[direction] != this.sprite.textures) {
-          this.sprite.textures = animKey[direction];
+        var animMap = {2: this.animDown, 1: this.animLeft, 0: this.animRight, 3: this.animUp};
+        if (animMap[direction] != this.sprite.textures) {
+          this.sprite.textures = animMap[direction];
         }
 
         if (this.moveX == 0 && this.moveY == 0) {

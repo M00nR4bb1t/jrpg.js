@@ -69,14 +69,15 @@ class Entity {
 class Player extends Entity {
   constructor(container, gridX, gridY, texture) {
     super(container, gridX, gridY, null);
+    solid[gridY][gridX] = [false, false, false, false];
 
     this.desireX = this.targetX = gridX;
     this.desireY = this.targetY = gridY;
 
-    this.animDown = [new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0, texture.height * 0, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.25, texture.height * 0, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.5, texture.height * 0, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.75, texture.height * 0, texture.width * 0.25, texture.height * 0.25))];
-    this.animLeft = [new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0, texture.height * 0.25, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.25, texture.height * 0.25, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.5, texture.height * 0.25, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.75, texture.height * 0.25, texture.width * 0.25, texture.height * 0.25))];
-    this.animRight = [new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0, texture.height * 0.5, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.25, texture.height * 0.5, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.5, texture.height * 0.5, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.75, texture.height * 0.5, texture.width * 0.25, texture.height * 0.25))];
-    this.animUp = [new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0, texture.height * 0.75, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.25, texture.height * 0.75, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.5, texture.height * 0.75, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.75, texture.height * 0.75, texture.width * 0.25, texture.height * 0.25))];
+    this.animDown = [new PIXI.Texture(texture, new PIXI.Rectangle(Math.round(0), Math.round(0), Math.round(texture.width / 4), Math.round(texture.height / 4))), new PIXI.Texture(texture, new PIXI.Rectangle(Math.round(texture.width / 4), Math.round(0), Math.round(texture.width / 4), Math.round(texture.height / 4))), new PIXI.Texture(texture, new PIXI.Rectangle(Math.round(texture.width / 2), Math.round(0), Math.round(texture.width / 4), Math.round(texture.height / 4))), new PIXI.Texture(texture, new PIXI.Rectangle(Math.round(texture.width / 4 * 3), Math.round(0), Math.round(texture.width / 4), Math.round(texture.height / 4)))];
+    this.animLeft = [new PIXI.Texture(texture, new PIXI.Rectangle(Math.round(0), Math.round(texture.height / 4), Math.round(texture.width / 4), Math.round(texture.height / 4))), new PIXI.Texture(texture, new PIXI.Rectangle(Math.round(texture.width / 4), Math.round(texture.height / 4), Math.round(texture.width / 4), Math.round(texture.height / 4))), new PIXI.Texture(texture, new PIXI.Rectangle(Math.round(texture.width / 2), Math.round(texture.height / 4), Math.round(texture.width / 4), Math.round(texture.height / 4))), new PIXI.Texture(texture, new PIXI.Rectangle(Math.round(texture.width / 4 * 3), Math.round(texture.height / 4), Math.round(texture.width / 4), Math.round(texture.height / 4)))];
+    this.animRight = [new PIXI.Texture(texture, new PIXI.Rectangle(Math.round(0), Math.round(texture.height / 2), Math.round(texture.width / 4), Math.round(texture.height / 4))), new PIXI.Texture(texture, new PIXI.Rectangle(Math.round(texture.width / 4), Math.round(texture.height / 2), Math.round(texture.width / 4), Math.round(texture.height / 4))), new PIXI.Texture(texture, new PIXI.Rectangle(Math.round(texture.width / 2), Math.round(texture.height / 2), Math.round(texture.width / 4), Math.round(texture.height / 4))), new PIXI.Texture(texture, new PIXI.Rectangle(Math.round(texture.width / 4 * 3), Math.round(texture.height / 2), Math.round(texture.width / 4), Math.round(texture.height / 4)))];
+    this.animUp = [new PIXI.Texture(texture, new PIXI.Rectangle(Math.round(0), Math.round(texture.height / 4 * 3), Math.round(texture.width / 4), Math.round(texture.height / 4))), new PIXI.Texture(texture, new PIXI.Rectangle(Math.round(texture.width / 4), Math.round(texture.height / 4 * 3), Math.round(texture.width / 4), Math.round(texture.height / 4))), new PIXI.Texture(texture, new PIXI.Rectangle(Math.round(texture.width / 2), Math.round(texture.height / 4 * 3), Math.round(texture.width / 4), Math.round(texture.height / 4))), new PIXI.Texture(texture, new PIXI.Rectangle(Math.round(texture.width / 4 * 3), Math.round(texture.height / 4 * 3), Math.round(texture.width / 4), Math.round(texture.height / 4)))];
 
     this.sprite = new PIXI.AnimatedSprite(this.animDown);
     this.sprite.anchor.set(0.5, 1);
@@ -101,19 +102,21 @@ class Player extends Entity {
       this.desireX = this.gridX + Math.sign(this.moveX);
       this.desireY = this.gridY + Math.sign(this.moveY);
 
-      if (this.desireX < 0 || this.desireY < 0 || this.desireX >= tilemap.width || this.desireY >= tilemap.height || solid[this.gridY + Math.sign(this.moveY)][this.gridX + Math.sign(this.moveX)]) {
+      solid[this.targetY][this.targetX] = tilemap.solid[this.targetY][this.targetX];
+
+      var directionMap = {'ArrowDown': 0, 'ArrowLeft': 1, 'ArrowRight': 2, 'ArrowUp': 3};
+      if (this.desireX < 0 || this.desireY < 0 || this.desireX >= tilemap.width || this.desireY >= tilemap.height || solid[this.gridY][this.gridX][directionMap[this.movementKeys[0]]] || solid[this.gridY + Math.sign(this.moveY)][this.gridX + Math.sign(this.moveX)][3 - directionMap[this.movementKeys[0]]]) {
         this.moveX = 0;
         this.moveY = 0;
       }
 
-      solid[this.targetY][this.targetX] = false;
       this.targetX = this.gridX + Math.sign(this.moveX);
       this.targetY = this.gridY + Math.sign(this.moveY);
-      solid[this.targetY][this.targetX] = true;
+      solid[this.targetY][this.targetX] = [true, true, true, true];
 
-      var animKey = {'ArrowDown': this.animDown, 'ArrowLeft': this.animLeft, 'ArrowRight': this.animRight, 'ArrowUp': this.animUp};
-      if (this.movementKeys.length > 0 && animKey[this.movementKeys[0]] != this.sprite.textures) {
-        this.sprite.textures = animKey[this.movementKeys[0]];
+      var animMap = {'ArrowDown': this.animDown, 'ArrowLeft': this.animLeft, 'ArrowRight': this.animRight, 'ArrowUp': this.animUp};
+      if (this.movementKeys.length > 0 && animMap[this.movementKeys[0]] != this.sprite.textures) {
+        this.sprite.textures = animMap[this.movementKeys[0]];
       }
 
       if (this.moveX == 0 && this.moveY == 0) {
