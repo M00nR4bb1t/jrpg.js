@@ -91,7 +91,7 @@ class Player extends Entity {
     this.paralyzed = false;
   }
 
-  update(delta, deltaPrev) {
+  update(delta) {
     if (this.remX == 0 && this.remY == 0) {
       var animPrev = this.sprite.textures, framePrev = this.sprite.currentFrame;
 
@@ -121,7 +121,7 @@ class Player extends Entity {
       } else if (this.sprite.textures != animPrev || !this.sprite.playing) {
         this.sprite.gotoAndPlay(framePrev + 1);
       }
-    } else if (Math.abs(Math.round(this.remX) - this.remX) < this.speed * deltaPrev && Math.abs(Math.round(this.remY) - this.remY) < this.speed * deltaPrev) {
+    } else if (this.remX + this.moveX * delta < 0 || this.remX + this.moveX * delta > 1 || this.remY + this.moveY * delta < 0 || this.remY + this.moveY * delta > 1) {
       this.remX = Math.round(this.remX);
       this.remY = Math.round(this.remY);
 

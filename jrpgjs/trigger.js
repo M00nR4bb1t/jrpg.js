@@ -17,11 +17,12 @@ class Event {
 }
 
 class TextboxEvent extends Event {
-  constructor(message, name='') {
+  constructor(message, name='', voice) {
     super();
     this.container = new PIXI.Container();
     this.container.z = Number.MAX_VALUE;
     this.message = message;
+    this.voice = voice;
     
     var graphics = new PIXI.Graphics();
     graphics.beginFill(0x555555, 0.5);
@@ -80,7 +81,7 @@ class TextboxEvent extends Event {
       var charAt = this.message.charAt(this.reveal - 1);
       if (charAt != ' ' &&
           charAt != '-') {
-        PIXI.Loader.shared.resources['voice'].sound.play();
+        if (this.voice) this.voice.play();
       }
     }
   }
@@ -99,12 +100,13 @@ class TextboxEvent extends Event {
 }
 
 class SelectionEvent extends Event {
-  constructor(message, options, name='', selection=0) {
+  constructor(message, options, name='', voice, selection=0) {
     super();
     this.container = new PIXI.Container();
     this.container.z = Number.MAX_VALUE;
     this.message = message;
     this.options = options;
+    this.voice = voice;
     
     this.graphics = new PIXI.Graphics();
     this.container.addChild(this.graphics);
@@ -180,7 +182,7 @@ class SelectionEvent extends Event {
       var charAt = this.message.charAt(this.reveal - 1);
       if (charAt != ' ' &&
           charAt != '-') {
-        PIXI.Loader.shared.resources['voice'].sound.play();
+        if (this.voice) this.voice.sound.play();
       }
     }
   }
@@ -319,7 +321,7 @@ class NPC extends Trigger {
     this.speed = 0.01;
   }
 
-  update(delta, deltaPrev) {
+  update(delta) {
     if (this.remX == 0 && this.remY == 0) {
       if (this.playing) {
         if (player.gridX < this.gridX) this.sprite.textures = this.animLeft;
@@ -352,7 +354,7 @@ class NPC extends Trigger {
           this.sprite.gotoAndPlay(framePrev + 1);
         }
       }
-    } else if (Math.abs(Math.round(this.remX) - this.remX) < this.speed * deltaPrev && Math.abs(Math.round(this.remY) - this.remY) < this.speed * deltaPrev) {
+    } else if (this.remX + this.moveX < 0 || this.remX + this.moveX > 1 || this.remY + this.moveY < 0 || this.remY + this.moveY > 1) {
       this.remX = Math.round(this.remX);
       this.remY = Math.round(this.remY);
 

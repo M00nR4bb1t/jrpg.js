@@ -19,8 +19,6 @@ var tileset, tilemap;
 var triggers = [];
 var solid;
 
-var deltaPrev = 1;
-
 var debug = true;
 var debugGraphics = new PIXI.Graphics();
 debugGraphics.z = 1000;
@@ -36,10 +34,10 @@ function setup() {
 
   triggers.push(new NPC(app.stage, 5, 5, PIXI.Loader.shared.resources['joe'].texture, {
     'main':[
-      new TextboxEvent('Why, hello there, young man!', '???'),
-      new TextboxEvent('The name\'s Joe! Nice to meet you!', 'Joe'),
+      new TextboxEvent('Why, hello there, young man!', '???', PIXI.Loader.shared.resources['voice'].sound),
+      new TextboxEvent('The name\'s Joe! Nice to meet you!', 'Joe', PIXI.Loader.shared.resources['voice'].sound),
       new DelayEvent(180),
-      new TextboxEvent('Well, I hope to see you around.', 'Joe')
+      new TextboxEvent('Well, I hope to see you around.', 'Joe', PIXI.Loader.shared.resources['voice'].sound)
     ]
   }));
 
@@ -75,16 +73,14 @@ function setup() {
 }
 
 function update(delta) {
-  if (debug) debugGraphics.clear(); 
+  if (debug) debugGraphics.clear();
 
-  player.update(delta, deltaPrev);
+  player.update(delta);
   for (var i=0; i<triggers.length; i++) {
-    triggers[i].update(delta, deltaPrev);
+    triggers[i].update(delta);
   }
 
   app.stage.children.sort(zSort);
-
-  deltaPrev = delta;
 
   if (!debug) return;
   debugGraphics.beginFill(0xFF0000, 0.5);
