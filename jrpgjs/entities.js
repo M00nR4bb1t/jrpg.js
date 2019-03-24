@@ -13,7 +13,7 @@ class Entity {
       this.sprite.y = this.sprite.z = Math.round(this.y);
       container.addChild(this.sprite);
 
-      this.zText = new PIXI.Text(`${this.sprite.z.toString(10)}\n${app.stage.children.indexOf(this.sprite)}`, new PIXI.TextStyle({
+      this.zText = new PIXI.Text(`${this.sprite.z.toString(10)}\n${viewport.children.indexOf(this.sprite)}`, new PIXI.TextStyle({
         fontFamily: 'Raleway',
         fontSize: 12,
         fontWeight: 300,
@@ -45,11 +45,11 @@ class Entity {
       this.sprite.x = Math.round(this.x);
       this.sprite.y = this.sprite.z = Math.round(this.y);
       if (this.zText) {
-        this.zText.text = `${this.sprite.z.toString(10)}\n${app.stage.children.indexOf(this.sprite)}`;
+        this.zText.text = `${this.sprite.z.toString(10)}\n${viewport.children.indexOf(this.sprite)}`;
         this.zText.x = Math.round(this.x);
         this.zText.y = Math.round(this.y);
       } else {
-        this.zText = new PIXI.Text(`${this.sprite.z.toString(10)}\n${app.stage.children.indexOf(this.sprite)}`, new PIXI.TextStyle({
+        this.zText = new PIXI.Text(`${this.sprite.z.toString(10)}\n${viewport.children.indexOf(this.sprite)}`, new PIXI.TextStyle({
           fontFamily: 'Raleway',
           fontSize: 12,
           fontWeight: 300,

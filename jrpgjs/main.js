@@ -1,8 +1,10 @@
+const viewportWidth = 544;
+const viewportHeight = 416;
 const gridWidth = 32;
 const gridHeight = 32;
 const frameRate = 60;
 
-let app = new PIXI.Application({width: 544, height: 416});
+let app = new PIXI.Application({width: viewportWidth, height: viewportHeight});
 document.body.appendChild(app.view);
 document.addEventListener('keydown', keyDown);
 document.addEventListener('keyup', keyUp);
@@ -19,6 +21,9 @@ var tileset, tilemap;
 var triggers = [];
 var solid;
 
+var viewport = new PIXI.Container();
+app.stage.addChild(viewport);
+
 var debug = true;
 var debugGraphics = new PIXI.Graphics();
 debugGraphics.z = 1000;
@@ -29,10 +34,10 @@ function zSort(a, b) {
 
 function setup() {
   tileset = new Tileset(PIXI.Loader.shared.resources['cafe'].texture, [72]);
-  tilemap = new Tilemap(app.stage, tileset, [[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]], 17, 13);
+  tilemap = new Tilemap(viewport, tileset, [[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]], 25, 25);
   solid = tilemap.solid;
 
-  triggers.push(new NPC(app.stage, 5, 5, PIXI.Loader.shared.resources['joe'].texture, {
+  triggers.push(new NPC(viewport, 5, 5, PIXI.Loader.shared.resources['joe'].texture, {
     'main':[
       new TextboxEvent('Why, hello there, young man!', '???', PIXI.Loader.shared.resources['voice'].sound),
       new TextboxEvent('The name\'s Joe! Nice to meet you!', 'Joe', PIXI.Loader.shared.resources['voice'].sound),
@@ -41,7 +46,7 @@ function setup() {
     ]
   }));
 
-  triggers.push(new Trigger(app.stage, 10, 5, new PIXI.Sprite(tileset.textures[72]), true, {
+  triggers.push(new Trigger(viewport, 10, 5, new PIXI.Sprite(tileset.textures[72]), true, {
     'main':[
       new TextboxEvent('A tray of freshly-baked bread. Looks delicious!'),
       new SelectionEvent('Take one?', [{'text': 'Yes', 'channel': 'takeBread'}, {'text': 'No','channel': 'dontTakeBread'}])
@@ -55,13 +60,13 @@ function setup() {
     ]
   }));
 
-  player = new Player(app.stage, 0, 0, PIXI.Loader.shared.resources['tremel'].texture);
+  player = new Player(viewport, 0, 0, PIXI.Loader.shared.resources['tremel'].texture);
 
-  app.stage.addChild(debugGraphics);
+  viewport.addChild(debugGraphics);
   app.ticker.add(delta => update(delta));
 
   minFPS = app.ticker.FPS;
-  this.fpsText = new PIXI.Text(`${app.ticker.FPS}\n${minFPS}`, new PIXI.TextStyle({
+  fpsText = new PIXI.Text(`${app.ticker.FPS}\n${minFPS}`, new PIXI.TextStyle({
     fontFamily: 'Raleway',
     fontSize: 12,
     fontWeight: 300,
@@ -69,7 +74,7 @@ function setup() {
     wordWrap: true,
     wordWrapWidth: 524
   }));
-  debugGraphics.addChild(this.fpsText);
+  debugGraphics.addChild(fpsText);
 }
 
 function update(delta) {
@@ -80,7 +85,10 @@ function update(delta) {
     triggers[i].update(delta);
   }
 
-  app.stage.children.sort(zSort);
+  viewport.x = Math.clamp(viewportWidth / 2 - player.x - gridWidth / 2, -(tilemap.width * gridWidth - viewportWidth), 0);
+  viewport.y = Math.clamp(viewportHeight / 2 - player.y - gridHeight / 2, -(tilemap.height * gridHeight - viewportHeight), 0);
+
+  viewport.children.sort(zSort);
 
   if (!debug) return;
   debugGraphics.beginFill(0xFF0000, 0.5);
@@ -93,10 +101,10 @@ function update(delta) {
   }
   debugGraphics.endFill();
 
-  if (app.ticker.FPS) {
-    if (app.ticker.FPS < minFPS) minFPS = app.ticker.FPS;
-    fpsText.text = `${app.ticker.FPS}\n${minFPS}`;
-  }
+  if (app.ticker.FPS < minFPS) minFPS = app.ticker.FPS;
+  fpsText.text = `${app.ticker.FPS}\n${minFPS}`;
+  fpsText.x = -viewport.x;
+  fpsText.y = -viewport.y;
 }
 
 function setDebug(x) {
