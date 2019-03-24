@@ -314,8 +314,8 @@ class NPC extends Trigger {
     this.sprite.anchor.set(0.5, 1);
     this.sprite.animationSpeed = 0.1;
 
-    this.sprite.x = this.x;
-    this.sprite.y = this.sprite.z = this.y;
+    this.sprite.x = Math.round(this.x);
+    this.sprite.y = this.sprite.z = Math.round(this.y);
     container.addChild(this.sprite);
 
     this.speed = 0.01;

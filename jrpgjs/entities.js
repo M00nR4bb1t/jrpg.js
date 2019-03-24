@@ -9,8 +9,8 @@ class Entity {
     this.x = (this.gridX + this.remX) * gridWidth;
     this.y = (this.gridY + this.remY) * gridHeight;
     if (this.sprite) {
-      this.sprite.x = this.x;
-      this.sprite.y = this.sprite.z = this.y;
+      this.sprite.x = Math.round(this.x);
+      this.sprite.y = this.sprite.z = Math.round(this.y);
       container.addChild(this.sprite);
 
       this.zText = new PIXI.Text(`${this.sprite.z.toString(10)}\n${app.stage.children.indexOf(this.sprite)}`, new PIXI.TextStyle({
@@ -22,8 +22,8 @@ class Entity {
         wordWrapWidth: 524
       }));
 
-      this.zText.x = this.x;
-      this.zText.y = this.y;
+      this.zText.x = Math.round(this.x);
+      this.zText.y = Math.round(this.y);
       debugGraphics.addChild(this.zText);
     }
 
@@ -42,12 +42,12 @@ class Entity {
     this.x = (this.gridX + this.remX) * gridWidth;
     this.y = (this.gridY + this.remY) * gridHeight;
     if (this.sprite) {
-      this.sprite.x = this.x;
-      this.sprite.y = this.sprite.z = this.y;
+      this.sprite.x = Math.round(this.x);
+      this.sprite.y = this.sprite.z = Math.round(this.y);
       if (this.zText) {
         this.zText.text = `${this.sprite.z.toString(10)}\n${app.stage.children.indexOf(this.sprite)}`;
-        this.zText.x = this.x;
-        this.zText.y = this.y;
+        this.zText.x = Math.round(this.x);
+        this.zText.y = Math.round(this.y);
       } else {
         this.zText = new PIXI.Text(`${this.sprite.z.toString(10)}\n${app.stage.children.indexOf(this.sprite)}`, new PIXI.TextStyle({
           fontFamily: 'Raleway',
@@ -58,8 +58,8 @@ class Entity {
           wordWrapWidth: 524
         }));
 
-        this.zText.x = this.x;
-        this.zText.y = this.y;
+        this.zText.x = Math.round(this.x);
+        this.zText.y = Math.round(this.y);
         debugGraphics.addChild(this.zText);
       }
     }
@@ -82,8 +82,8 @@ class Player extends Entity {
     this.sprite.anchor.set(0.5, 1);
     this.sprite.animationSpeed = 0.1;
 
-    this.sprite.x = this.x;
-    this.sprite.y = this.sprite.z = this.y;
+    this.sprite.x = Math.round(this.x);
+    this.sprite.y = this.sprite.z = Math.round(this.y);
     container.addChild(this.sprite);
 
     this.speed = 0.05;
