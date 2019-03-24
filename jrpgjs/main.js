@@ -55,6 +55,17 @@ function setup() {
 
   app.stage.addChild(debugGraphics);
   app.ticker.add(delta => update(delta));
+
+  minFPS = app.ticker.FPS;
+  this.fpsText = new PIXI.Text(`${app.ticker.FPS}\n${minFPS}`, new PIXI.TextStyle({
+    fontFamily: 'Raleway',
+    fontSize: 12,
+    fontWeight: 300,
+    fill: '#FFFFFF',
+    wordWrap: true,
+    wordWrapWidth: 524
+  }));
+  debugGraphics.addChild(this.fpsText);
 }
 
 function update(delta) {
@@ -79,6 +90,11 @@ function update(delta) {
     }
   }
   debugGraphics.endFill();
+
+  if (app.ticker.FPS) {
+    if (app.ticker.FPS < minFPS) minFPS = app.ticker.FPS;
+    fpsText.text = `${app.ticker.FPS}\n${minFPS}`;
+  }
 }
 
 function setDebug(x) {
