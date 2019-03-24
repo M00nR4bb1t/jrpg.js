@@ -70,8 +70,8 @@ class Player extends Entity {
   constructor(container, gridX, gridY, texture) {
     super(container, gridX, gridY, null);
 
-    this.desireX = 0;
-    this.desireY = 0;
+    this.desireX = this.targetX = gridX;
+    this.desireY = this.targetY = gridY;
 
     this.animDown = [new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0, texture.height * 0, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.25, texture.height * 0, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.5, texture.height * 0, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.75, texture.height * 0, texture.width * 0.25, texture.height * 0.25))];
     this.animLeft = [new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0, texture.height * 0.25, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.25, texture.height * 0.25, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.5, texture.height * 0.25, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.75, texture.height * 0.25, texture.width * 0.25, texture.height * 0.25))];
@@ -91,16 +91,9 @@ class Player extends Entity {
     this.paralyzed = false;
   }
 
-  update(delta) {
-    if (Math.abs(Math.round(this.remX) - this.remX) < this.speed && Math.abs(Math.round(this.remY) - this.remY) < this.speed) {
-      var moveXPrev = this.moveX, moveYPrev = this.moveY, framePrev = this.sprite.currentFrame;
-      this.remX = Math.round(this.remX);
-      this.remY = Math.round(this.remY);
-
-      while (this.remX >= 1) {this.remX--; this.gridX++;}
-      while (this.remX < 0) {this.remX++; this.gridX--;}
-      while (this.remY >= 1) {this.remY--; this.gridY++;}
-      while (this.remY < 0) {this.remY++; this.gridY--;}
+  update(delta, deltaPrev) {
+    if (this.remX == 0 && this.remY == 0) {
+      var animPrev = this.sprite.textures, framePrev = this.sprite.currentFrame;
 
       this.moveX = ((this.movementKeys.indexOf('ArrowRight') == 0)?this.speed:0) - ((this.movementKeys.indexOf('ArrowLeft') == 0)?this.speed:0);
       this.moveY = ((this.movementKeys.indexOf('ArrowDown') == 0)?this.speed:0) - ((this.movementKeys.indexOf('ArrowUp') == 0)?this.speed:0);
@@ -113,8 +106,10 @@ class Player extends Entity {
         this.moveY = 0;
       }
 
-      solid[this.gridY][this.gridX] = false;
-      solid[this.gridY + Math.sign(this.moveY)][this.gridX + Math.sign(this.moveX)] = true;
+      solid[this.targetY][this.targetX] = false;
+      this.targetX = this.gridX + Math.sign(this.moveX);
+      this.targetY = this.gridY + Math.sign(this.moveY);
+      solid[this.targetY][this.targetX] = true;
 
       var animKey = {'ArrowDown': this.animDown, 'ArrowLeft': this.animLeft, 'ArrowRight': this.animRight, 'ArrowUp': this.animUp};
       if (this.movementKeys.length > 0 && animKey[this.movementKeys[0]] != this.sprite.textures) {
@@ -123,9 +118,20 @@ class Player extends Entity {
 
       if (this.moveX == 0 && this.moveY == 0) {
         this.sprite.gotoAndStop(0);
-      } else if (this.moveX != moveXPrev || this.moveY != moveYPrev) {
+      } else if (this.sprite.textures != animPrev) {
         this.sprite.gotoAndPlay(framePrev + 1);
       }
+    } else if (Math.abs(Math.round(this.remX) - this.remX) < this.speed * deltaPrev && Math.abs(Math.round(this.remY) - this.remY) < this.speed * deltaPrev) {
+      this.remX = Math.round(this.remX);
+      this.remY = Math.round(this.remY);
+
+      while (this.remX >= 1) {this.remX--; this.gridX++;}
+      while (this.remX < 0) {this.remX++; this.gridX--;}
+      while (this.remY >= 1) {this.remY--; this.gridY++;}
+      while (this.remY < 0) {this.remY++; this.gridY--;}
+
+      this.moveX = 0;
+      this.moveY = 0;
     }
 
     if (debug) {

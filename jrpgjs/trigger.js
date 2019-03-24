@@ -300,8 +300,8 @@ class NPC extends Trigger {
   constructor(container, gridX, gridY, texture, eventStream) {
     super(container, gridX, gridY, null, true, eventStream);
 
-    this.targetX = 0;
-    this.targetY = 0;
+    this.targetX = gridX;
+    this.targetY = gridY;
 
     this.animDown = [new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0, texture.height * 0, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.25, texture.height * 0, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.5, texture.height * 0, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.75, texture.height * 0, texture.width * 0.25, texture.height * 0.25))];
     this.animLeft = [new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0, texture.height * 0.25, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.25, texture.height * 0.25, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.5, texture.height * 0.25, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.75, texture.height * 0.25, texture.width * 0.25, texture.height * 0.25))];
@@ -319,20 +319,9 @@ class NPC extends Trigger {
     this.speed = 0.01;
   }
 
-  update(delta) {
-    if (Math.abs(Math.round(this.remX) - this.remX) < this.speed && Math.abs(Math.round(this.remY) - this.remY) < this.speed) {
-      this.remX = Math.round(this.remX);
-      this.remY = Math.round(this.remY);
-
-      while (this.remX >= 1) {this.remX--; this.gridX++;}
-      while (this.remX < 0) {this.remX++; this.gridX--;}
-      while (this.remY >= 1) {this.remY--; this.gridY++;}
-      while (this.remY < 0) {this.remY++; this.gridY--;}
-      
+  update(delta, deltaPrev) {
+    if (this.remX == 0 && this.remY == 0) {
       if (this.playing) {
-        this.moveX = 0;
-        this.moveY = 0;
-
         if (player.gridX < this.gridX) this.sprite.textures = this.animLeft;
         else if (player.gridX > this.gridX) this.sprite.textures = this.animRight;
         else if (player.gridY < this.gridY) this.sprite.textures = this.animUp;
@@ -340,16 +329,17 @@ class NPC extends Trigger {
 
         this.sprite.gotoAndStop(0);
       } else {
-        var moveXPrev = this.moveX, moveYPrev = this.moveY, framePrev = this.sprite.currentFrame;
-        var direction = Math.choose(0, 1, 2, 3); // Right, Left, Down, Up
+        var animPrev = this.sprite.textures, framePrev = this.sprite.currentFrame;
+        do {
+          var direction = Math.choose(0, 1, 2, 3); // Right, Left, Down, Up
+          this.moveX = ((direction == 0)?this.speed:0) - ((direction == 1)?this.speed:0);
+          this.moveY = ((direction == 2)?this.speed:0) - ((direction == 3)?this.speed:0);
+        } while (this.gridX + Math.sign(this.moveX) < 0 || this.gridY + Math.sign(this.moveY) < 0 || this.gridX + Math.sign(this.moveX) >= tilemap.width || this.gridY + Math.sign(this.moveY) >= tilemap.height || solid[this.gridY + Math.sign(this.moveY)][this.gridX + Math.sign(this.moveX)])
 
-        this.moveX = ((direction == 0)?this.speed:0) - ((direction == 1)?this.speed:0);
-        this.moveY = ((direction == 2)?this.speed:0) - ((direction == 3)?this.speed:0);
-
-        if (this.gridX + Math.sign(this.moveX) < 0 || this.gridY + Math.sign(this.moveY) < 0 || this.gridX + Math.sign(this.moveX) >= tilemap.width || this.gridY + Math.sign(this.moveY) >= tilemap.height || solid[this.gridY + Math.sign(this.moveY)][this.gridX + Math.sign(this.moveX)]) {
-          this.moveX = 0;
-          this.moveY = 0;
-        }
+        solid[this.targetY][this.targetX] = false;
+        this.targetX = this.gridX + Math.sign(this.moveX);
+        this.targetY = this.gridY + Math.sign(this.moveY);
+        solid[this.targetY][this.targetX] = true;
 
         var animKey = {2: this.animDown, 1: this.animLeft, 0: this.animRight, 3: this.animUp};
         if (animKey[direction] != this.sprite.textures) {
@@ -358,13 +348,21 @@ class NPC extends Trigger {
 
         if (this.moveX == 0 && this.moveY == 0) {
           this.sprite.gotoAndStop(0);
-        } else if (this.moveX != moveXPrev || this.moveY != moveYPrev) {
+        } else if (this.sprite.textures != animPrev) {
           this.sprite.gotoAndPlay(framePrev + 1);
         }
       }
+    } else if (Math.abs(Math.round(this.remX) - this.remX) < this.speed * deltaPrev && Math.abs(Math.round(this.remY) - this.remY) < this.speed * deltaPrev) {
+      this.remX = Math.round(this.remX);
+      this.remY = Math.round(this.remY);
 
-      solid[this.gridY][this.gridX] = false;
-      solid[this.gridY + Math.sign(this.moveY)][this.gridX + Math.sign(this.moveX)] = true;
+      while (this.remX >= 1) {this.remX--; this.gridX++;}
+      while (this.remX < 0) {this.remX++; this.gridX--;}
+      while (this.remY >= 1) {this.remY--; this.gridY++;}
+      while (this.remY < 0) {this.remY++; this.gridY--;}
+
+      this.moveX = 0;
+      this.moveY = 0;
     }
 
     super.update(delta);

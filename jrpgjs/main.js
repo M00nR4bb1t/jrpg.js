@@ -19,6 +19,8 @@ var tileset, tilemap;
 var triggers = [];
 var solid;
 
+var deltaPrev = 1;
+
 var debug = true;
 var debugGraphics = new PIXI.Graphics();
 debugGraphics.z = 1000;
@@ -71,14 +73,16 @@ function setup() {
 function update(delta) {
   if (debug) debugGraphics.clear(); 
 
-  player.update(delta);
+  player.update(delta, deltaPrev);
   for (var i=0; i<triggers.length; i++) {
-    triggers[i].update(delta);
+    triggers[i].update(delta, deltaPrev);
   }
 
   app.stage.children.sort(function (a, b) {
     return a.z - b.z;
   });
+
+  deltaPrev = delta;
 
   if (!debug) return;
   debugGraphics.beginFill(0xFF0000, 0.5);
