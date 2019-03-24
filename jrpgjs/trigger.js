@@ -336,16 +336,16 @@ class NPC extends Trigger {
         solid[this.targetY][this.targetX] = tilemap.solid[this.targetY][this.targetX];
         
         do {
-          var direction = Math.choose(0, 1, 2, 3); // Right, Left, Down, Up
-          this.moveX = ((direction == 0)?this.speed:0) - ((direction == 1)?this.speed:0);
-          this.moveY = ((direction == 2)?this.speed:0) - ((direction == 3)?this.speed:0);
+          var direction = Math.choose(0, 1, 2, 3); // Down Left Right Up
+          this.moveX = ((direction == 2)?this.speed:0) - ((direction == 1)?this.speed:0);
+          this.moveY = ((direction == 0)?this.speed:0) - ((direction == 3)?this.speed:0);
         } while (this.gridX + Math.sign(this.moveX) < 0 || this.gridY + Math.sign(this.moveY) < 0 || this.gridX + Math.sign(this.moveX) >= tilemap.width || this.gridY + Math.sign(this.moveY) >= tilemap.height || solid[this.gridY][this.gridX][direction] || solid[this.gridY + Math.sign(this.moveY)][this.gridX + Math.sign(this.moveX)][3 - direction])
 
         this.targetX = this.gridX + Math.sign(this.moveX);
         this.targetY = this.gridY + Math.sign(this.moveY);
         solid[this.targetY][this.targetX] = [true, true, true, true];
 
-        var animMap = {2: this.animDown, 1: this.animLeft, 0: this.animRight, 3: this.animUp};
+        var animMap = {0: this.animDown, 1: this.animLeft, 2: this.animRight, 3: this.animUp};
         if (animMap[direction] != this.sprite.textures) {
           this.sprite.textures = animMap[direction];
         }
