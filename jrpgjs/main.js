@@ -14,6 +14,7 @@ PIXI.Loader.shared.add('knight', 'res/characters/knight.png')
                   .add('joe', 'res/characters/joe.png')
                   .add('darkdimension', 'res/tilesets/darkdimension.png')
                   .add('voice', 'res/se/voice.wav')
+                  .add('nineslice', 'res/gui/nineslice.png')
                   .load(setup);
 
 var player;
@@ -54,12 +55,12 @@ function setup() {
 
   triggers.push(new Trigger(viewport, 21, 15, null, [true, true, true, true], {
     'main':[
-      new TextboxEvent('A diamond. It\'s floating..?'),
-      new SelectionEvent('Take it?', [{'text': 'Yes', 'channel': 'take'}, {'text': 'No','channel': 'dontTake'}])
+      new TextboxEvent('A diamond. It\'s floating..?', null, PIXI.Loader.shared.resources['voice'].sound),
+      new SelectionEvent('Take it?', [{'text': 'Yes', 'channel': 'take'}, {'text': 'No'}], null, PIXI.Loader.shared.resources['voice'].sound)
     ],
     'take':[
       new DelayEvent(120),
-      new TextboxEvent('You try to take the diamond, but it doesn\'t budge.')
+      new TextboxEvent('You try to take the diamond, but it doesn\'t budge.', null, PIXI.Loader.shared.resources['voice'].sound)
     ],
     'dontTake':[
       new DelayEvent(0)

@@ -20,18 +20,18 @@ class TextboxEvent extends Event {
   constructor(message, name='', voice) {
     super();
     this.container = new PIXI.Container();
+    this.container.y = viewportHeight - Math.round(viewportHeight * 0.4);
     this.container.z = Number.MAX_VALUE;
     this.message = message;
     this.voice = voice;
     
-    var graphics = new PIXI.Graphics();
-    graphics.beginFill(0x555555, 0.5);
-    graphics.drawRect(0, 250, 544, 166);
-    graphics.endFill();
-    this.container.addChild(graphics);
+    var bgRect = new PIXI.NineSlicePlane(PIXI.Loader.shared.resources['nineslice'].texture, 17, 17, 17, 17);
+    bgRect.width = viewportWidth;
+    bgRect.height = viewportHeight - this.container.y;
+    this.container.addChild(bgRect);
 
-    if (name != '') {
-      var nameText = new PIXI.Text(name, new PIXI.TextStyle({
+    if (name) {
+      var nameText = new PIXI.Text(`[ ${name} ]`, new PIXI.TextStyle({
         fontFamily: 'Raleway',
         fontSize: 18,
         fontWeight: 600,
@@ -40,7 +40,7 @@ class TextboxEvent extends Event {
         wordWrapWidth: 524
       }));
       nameText.x = 10;
-      nameText.y = 260;
+      nameText.y = 10;
       this.container.addChild(nameText);
     }
 
@@ -53,7 +53,7 @@ class TextboxEvent extends Event {
       wordWrapWidth: 524
     }));
     this.text.x = 10;
-    this.text.y = 280;
+    this.text.y = 30;
     this.container.addChild(this.text);
     
     this.container.visible = false;
@@ -103,13 +103,17 @@ class SelectionEvent extends Event {
   constructor(message, options, name='', voice, selection=0) {
     super();
     this.container = new PIXI.Container();
+    this.container.y = viewportHeight - Math.round(viewportHeight * 0.4);
     this.container.z = Number.MAX_VALUE;
     this.message = message;
     this.options = options;
+    this.defaultSelection = selection;
     this.voice = voice;
     
-    this.graphics = new PIXI.Graphics();
-    this.container.addChild(this.graphics);
+    var bgRect = new PIXI.NineSlicePlane(PIXI.Loader.shared.resources['nineslice'].texture, 17, 17, 17, 17);
+    bgRect.width = viewportWidth;
+    bgRect.height = viewportHeight - this.container.y;
+    this.container.addChild(bgRect);
 
     if (name != '') {
       var nameText = new PIXI.Text(name, new PIXI.TextStyle({
@@ -121,8 +125,7 @@ class SelectionEvent extends Event {
         wordWrapWidth: 524
       }));
       nameText.x = 10;
-      nameText.y = 260;
-      this.container.addChild(nameText);
+      nameText.y = 10;
     }
 
     this.text = new PIXI.Text('', new PIXI.TextStyle({
@@ -134,7 +137,7 @@ class SelectionEvent extends Event {
       wordWrapWidth: 524
     }));
     this.text.x = 10;
-    this.text.y = 280;
+    this.text.y = 30;
     this.container.addChild(this.text);
 
     var optionTextStyle = new PIXI.TextStyle({
@@ -146,11 +149,16 @@ class SelectionEvent extends Event {
       wordWrapWidth: 524
     });
 
-    var temp;
+    this.optionRects = [];
     for (var i=0; i<options.length; i++) {
-      temp = new PIXI.Text(options[i].text, optionTextStyle);
-      temp.x = 408;
-      temp.y = 252 + 24 * (i - options.length);
+      var temp = new PIXI.Text(options[i].text, optionTextStyle);
+      temp.x = viewportWidth - Math.round(viewportWidth * 0.25) + 8;
+      temp.y = 32 * (i - options.length) + 8;
+
+      var optionRect = new PIXI.NineSlicePlane(PIXI.Loader.shared.resources['nineslice'].texture, 17, 17, 17, 17);
+      this.optionRects.push(optionRect);
+
+      this.container.addChild(optionRect);
       this.container.addChild(temp);
     }
     
@@ -163,10 +171,18 @@ class SelectionEvent extends Event {
     
     this.reveal = 0;
     this.timer = 0;
-    this.selection = 0;
+    this.selection = this.defaultSelection;
     this.text.text = '';
-    
-    this.redraw();
+
+    for (var i=0; i<this.optionRects.length; i++) {
+      var notSelected = (i != this.selection);
+
+      this.optionRects[i].x = viewportWidth - Math.round(viewportWidth * 0.25) + (notSelected?2:0);
+      this.optionRects[i].y = 32 * (i - this.options.length) + (notSelected?2:0);
+      this.optionRects[i].width = Math.round(viewportWidth * 0.25) + (notSelected?-4:0);
+      this.optionRects[i].height = 32 + (notSelected?-4:0);
+      this.optionRects[i].tint = (notSelected?0xAAAAAA:0xFFFFFF)
+    }
     this.container.visible = true;
   }
 
@@ -182,44 +198,52 @@ class SelectionEvent extends Event {
       var charAt = this.message.charAt(this.reveal - 1);
       if (charAt != ' ' &&
           charAt != '-') {
-        if (this.voice) this.voice.sound.play();
+        if (this.voice) this.voice.play();
       }
     }
-  }
-
-  redraw() {
-    this.graphics.clear();
-    this.graphics.beginFill(0x555555, 0.5);
-    this.graphics.drawRect(0, 250, 544, 166);
-    for (var i=0; i<this.options.length; i++) {
-      if (i == this.selection) continue;
-      this.graphics.drawRect(400, 250 + 24 * (i - this.options.length), 144, 22);
-    }
-    this.graphics.endFill();
-
-    this.graphics.beginFill(0x888888, 0.5);
-    this.graphics.drawRect(400, 250 + 24 * (this.selection - this.options.length), 144, 22);
-    this.graphics.endFill();
   }
 
   keyDown(key) {
     if (key == 'KeyZ') {
       if (this.reveal == this.message.length) {
         this.container.visible = false;
-        this.trigger.goto(this.options[this.selection].channel);
+        if (this.options[this.selection].channel) this.trigger.goto(this.options[this.selection].channel);
+        else this.trigger.done();
       } else {
         this.reveal = this.message.length;
         this.text.text = this.message.substring(0, this.reveal);
       }
     } else if (key == 'ArrowUp') {
+      this.optionRects[this.selection].x += 2;
+      this.optionRects[this.selection].y += 2;
+      this.optionRects[this.selection].width -= 4;
+      this.optionRects[this.selection].height -= 4;
+      this.optionRects[this.selection].tint = 0xAAAAAA;
+
       this.selection --;
       while (this.selection < 0) {
         this.selection = this.options.length + this.selection;
       }
-      this.redraw();
+
+      this.optionRects[this.selection].x -= 2;
+      this.optionRects[this.selection].y -= 2;
+      this.optionRects[this.selection].width += 4;
+      this.optionRects[this.selection].height += 4;
+      this.optionRects[this.selection].tint = 0xFFFFFF;
     } else if (key == 'ArrowDown') {
+      this.optionRects[this.selection].x += 2;
+      this.optionRects[this.selection].y += 2;
+      this.optionRects[this.selection].width -= 4;
+      this.optionRects[this.selection].height -= 4;
+      this.optionRects[this.selection].tint = 0xAAAAAA;
+
       this.selection = (this.selection + 1) % this.options.length;
-      this.redraw();
+
+      this.optionRects[this.selection].x -= 2;
+      this.optionRects[this.selection].y -= 2;
+      this.optionRects[this.selection].width += 4;
+      this.optionRects[this.selection].height += 4;
+      this.optionRects[this.selection].tint = 0xFFFFFF;
     }
   }
 }
