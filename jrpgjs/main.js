@@ -138,11 +138,11 @@ function setup() {
           new TextboxEvent('You try to take the diamond crystal, but it doesn\'t budge.', null, PIXI.Loader.shared.resources['voice'].sound)
         ],
         'dontTake':[
-          new TextboxEvent('The diamond crystal is glowing. It feels like it\'s pulling my hand towards it.', 'Knight', null, PIXI.Loader.shared.resources['voice'].sound),
-          new SelectionEvent('Reach out and touch the crystal?', [{'text': 'Yes', 'channel': 'touch'}, {'text': 'No'}])
+          new TextboxEvent('The diamond crystal is glowing. It feels like it\'s pulling my hand towards it.', 'Knight', PIXI.Loader.shared.resources['voice'].sound),
+          new SelectionEvent('Reach out and touch the crystal?', [{'text': 'Yes', 'channel': 'touch'}, {'text': 'No'}], null, PIXI.Loader.shared.resources['voice'].sound)
         ],
         'touch':[
-          new MapChangeEvent('tproom', 8, 5)
+          new MapChangeEvent('tproom', 8, 5, 0)
         ]
       })
     ], 25, 25),
@@ -211,7 +211,7 @@ function setup() {
           new SelectionEvent('Go through the portal?', [{'text': 'Yes', 'channel': 'teleport'}, {'text': 'No'}], null, PIXI.Loader.shared.resources['voice'].sound)
         ],
         'teleport':[
-          new MapChangeEvent('darkdimension', 7, 11)
+          new MapChangeEvent('darkdimension', 20, 15, 1)
         ]
       }),
       new Trigger(8, 7, null, [true, true, true, true], {

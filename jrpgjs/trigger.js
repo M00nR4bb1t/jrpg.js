@@ -268,11 +268,12 @@ class DelayEvent extends Event {
 }
 
 class MapChangeEvent extends Event {
-  constructor(map, playerX, playerY) {
+  constructor(map, playerX, playerY, playerDirection=0) {
     super();
     this.map = map;
     this.playerX = playerX;
     this.playerY = playerY;
+    this.playerDirection = playerDirection;
   }
 
   play(trigger) {
@@ -303,6 +304,10 @@ class MapChangeEvent extends Event {
     player.gridY = this.playerY;
     player.targetX = this.playerX;
     player.targetY = this.playerY;
+    
+    var animMap = {0: player.animDown, 1: player.animLeft, 2: player.animRight, 3: player.animUp};
+    player.sprite.textures = animMap[this.playerDirection];
+    player.sprite.gotoAndStop(0);
 
     player.remX = 0;
     player.remY = 0;
