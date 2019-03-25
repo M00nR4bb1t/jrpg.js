@@ -90,8 +90,8 @@ function update(delta) {
     triggers[i].update(delta);
   }
 
-  viewport.x = Math.clamp(viewportWidth / 2 - player.x - gridWidth / 2, -(tilemap.width * gridWidth - viewportWidth), 0);
-  viewport.y = Math.clamp(viewportHeight / 2 - player.y - gridHeight / 2, -(tilemap.height * gridHeight - viewportHeight), 0);
+  viewport.x = Math.round(Math.clamp(viewportWidth / 2 - player.x - gridWidth / 2, -(tilemap.width * gridWidth - viewportWidth), 0));
+  viewport.y = Math.round(Math.clamp(viewportHeight / 2 - player.y - gridHeight / 2, -(tilemap.height * gridHeight - viewportHeight), 0));
 
   viewport.children.sort(zSort);
 

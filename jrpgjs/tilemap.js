@@ -15,7 +15,9 @@ class Tilemap {
     this.tileset = tileset;
     this.width = width;
     this.height = height;
-    this.container = new PIXI.Container();
+    this.graphics = new PIXI.Graphics();
+    this.graphics.z = 0;
+    container.addChild(this.graphics);
     
     this.solid = [];
     for (var y=0; y<height; y++) {
@@ -30,24 +32,12 @@ class Tilemap {
         for (var x=0; x<width; x++) {
           var tile = layers[z][y][x];
           if (tile == -1) continue;
-          var sprite = new PIXI.Sprite(this.tileset.textures[tile]);
-          sprite.x = x * gridWidth;
-          sprite.y = y * gridHeight;
-          this.container.addChild(sprite);
+          this.graphics.beginTextureFill(this.tileset.textures[tile]);
+          this.graphics.drawRect(x * gridWidth, y * gridHeight, gridWidth, gridHeight);
+          this.graphics.endFill();
           if (tileset.solidTiles[tile]) this.solid[y][x] = [this.solid[y][x][0] || tileset.solidTiles[tile][0], this.solid[y][x][1] || tileset.solidTiles[tile][1], this.solid[y][x][2] || tileset.solidTiles[tile][2], this.solid[y][x][3] || tileset.solidTiles[tile][3]];
         }
       }
     }
-
-    this.brt = new PIXI.BaseRenderTexture(width * gridWidth, height * gridHeight, PIXI.SCALE_MODES.LINEAR, 1);
-    this.rt = new PIXI.RenderTexture(this.brt);
-    var sprite = new PIXI.Sprite(this.rt);
-    sprite.z = 0;
-    container.addChild(sprite);
-    this.draw();
-  }
-
-  draw() {
-    app.renderer.render(this.container, this.rt);
   }
 }
