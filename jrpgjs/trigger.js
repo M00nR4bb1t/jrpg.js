@@ -267,10 +267,55 @@ class DelayEvent extends Event {
   }
 }
 
+class MapChangeEvent extends Event {
+  constructor(map, playerX, playerY) {
+    super();
+    this.map = map;
+    this.playerX = playerX;
+    this.playerY = playerY;
+  }
+
+  play(trigger) {
+    super.play(trigger);
+    map.remove();
+    map = maps[this.map];
+
+    solid = [];
+    
+    for (var i=0; i<map.solid.length; i++) {
+      solid.push(map.solid[i].slice());
+    }
+
+    for (var i=0; i<triggers.length; i++) {
+      triggers[i].remove();
+    }
+
+    triggers = [];
+
+    for (var i=0; i<map.triggers.length; i++) {
+      triggers.push(map.triggers[i]);
+      map.triggers[i].addTo(viewport);
+    }
+
+    map.addTo(viewport);
+
+    player.gridX = this.playerX;
+    player.gridY = this.playerY;
+    player.targetX = this.playerX;
+    player.targetY = this.playerY;
+
+    player.remX = 0;
+    player.remY = 0;
+    player.moveX = 0;
+    player.moveY = 0;
+    trigger.done();
+  }
+}
+
 class Trigger extends Entity {
-  constructor(container, gridX, gridY, sprite, isSolid, eventStream) {
-    super(container, gridX, gridY, sprite);
-    solid[this.gridY][this.gridX] = isSolid;
+  constructor(gridX, gridY, sprite, solidInfo, eventStream) {
+    super(gridX, gridY, sprite);
+    this.solidInfo = solidInfo;
     this.eventStream = eventStream;
     this.playing = false;
   }
@@ -320,11 +365,16 @@ class Trigger extends Entity {
       this.eventStream[this.channel][this.index].keyUp(key);
     }
   }
+
+  addTo(container) {
+    super.addTo(container);
+    if (!(this instanceof NPC)) solid[this.gridY][this.gridX] = this.solidInfo;
+  }
 }
 
 class NPC extends Trigger {
-  constructor(container, gridX, gridY, texture, eventStream) {
-    super(container, gridX, gridY, null, [true, true, true, true], eventStream);
+  constructor(gridX, gridY, texture, eventStream) {
+    super(gridX, gridY, null, [true, true, true, true], eventStream);
 
     this.targetX = gridX;
     this.targetY = gridY;
@@ -340,7 +390,6 @@ class NPC extends Trigger {
 
     this.sprite.x = Math.round(this.x);
     this.sprite.y = this.sprite.z = Math.round(this.y);
-    container.addChild(this.sprite);
 
     this.speed = 0.01;
   }
@@ -357,13 +406,13 @@ class NPC extends Trigger {
       } else {
         var animPrev = this.sprite.textures, framePrev = this.sprite.currentFrame;
 
-        solid[this.targetY][this.targetX] = tilemap.solid[this.targetY][this.targetX];
+        solid[this.targetY][this.targetX] = map.solid[this.targetY][this.targetX];
         
         do {
           var direction = Math.choose(0, 1, 2, 3); // Down Left Right Up
           this.moveX = ((direction == 2)?this.speed:0) - ((direction == 1)?this.speed:0);
           this.moveY = ((direction == 0)?this.speed:0) - ((direction == 3)?this.speed:0);
-        } while (this.gridX + Math.sign(this.moveX) < 0 || this.gridY + Math.sign(this.moveY) < 0 || this.gridX + Math.sign(this.moveX) >= tilemap.width || this.gridY + Math.sign(this.moveY) >= tilemap.height || solid[this.gridY][this.gridX][direction] || solid[this.gridY + Math.sign(this.moveY)][this.gridX + Math.sign(this.moveX)][3 - direction])
+        } while (this.gridX + Math.sign(this.moveX) < 0 || this.gridY + Math.sign(this.moveY) < 0 || this.gridX + Math.sign(this.moveX) >= map.width || this.gridY + Math.sign(this.moveY) >= map.height || solid[this.gridY][this.gridX][direction] || solid[this.gridY + Math.sign(this.moveY)][this.gridX + Math.sign(this.moveX)][3 - direction])
 
         this.targetX = this.gridX + Math.sign(this.moveX);
         this.targetY = this.gridY + Math.sign(this.moveY);

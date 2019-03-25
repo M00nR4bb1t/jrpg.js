@@ -11,13 +11,13 @@ class Tileset {
 }
 
 class Tilemap {
-  constructor(container, tileset, layers, width, height) {
+  constructor(tileset, layers, triggers, width, height) {
     this.tileset = tileset;
+    this.triggers = triggers;
     this.width = width;
     this.height = height;
     this.graphics = new PIXI.Graphics();
     this.graphics.z = 0;
-    container.addChild(this.graphics);
     
     this.solid = [];
     for (var y=0; y<height; y++) {
@@ -39,5 +39,13 @@ class Tilemap {
         }
       }
     }
+  }
+
+  addTo(container) {
+    container.addChild(this.graphics);
+  }
+
+  remove() {
+    this.graphics.parent.removeChild(this.graphics);
   }
 }

@@ -1,5 +1,5 @@
 class Entity {
-  constructor(container, gridX, gridY, sprite) {
+  constructor(gridX, gridY, sprite) {
     this.gridX = Math.floor(gridX);
     this.gridY = Math.floor(gridY);
     this.remX = gridX - this.gridX;
@@ -11,7 +11,6 @@ class Entity {
     if (this.sprite) {
       this.sprite.x = Math.round(this.x);
       this.sprite.y = this.sprite.z = Math.round(this.y);
-      container.addChild(this.sprite);
 
       this.zText = new PIXI.Text(`${this.sprite.z.toString(10)}\n${viewport.children.indexOf(this.sprite)}`, new PIXI.TextStyle({
         fontFamily: 'Raleway',
@@ -64,11 +63,19 @@ class Entity {
       }
     }
   }
+
+  addTo(container) {
+    if (this.sprite) container.addChild(this.sprite);
+  }
+
+  remove() {
+    if (this.sprite) this.sprite.parent.removeChild(this.sprite);
+  }
 }
 
 class Player extends Entity {
-  constructor(container, gridX, gridY, texture) {
-    super(container, gridX, gridY, null);
+  constructor(gridX, gridY, texture) {
+    super(gridX, gridY, null);
     solid[gridY][gridX] = [false, false, false, false];
 
     this.desireX = this.targetX = gridX;
@@ -85,7 +92,6 @@ class Player extends Entity {
 
     this.sprite.x = Math.round(this.x);
     this.sprite.y = this.sprite.z = Math.round(this.y);
-    container.addChild(this.sprite);
 
     this.speed = 0.05;
     this.movementKeys = [];
@@ -102,10 +108,10 @@ class Player extends Entity {
       this.desireX = this.gridX + Math.sign(this.moveX);
       this.desireY = this.gridY + Math.sign(this.moveY);
 
-      solid[this.targetY][this.targetX] = tilemap.solid[this.targetY][this.targetX];
+      solid[this.targetY][this.targetX] = map.solid[this.targetY][this.targetX];
 
       var directionMap = {'ArrowDown': 0, 'ArrowLeft': 1, 'ArrowRight': 2, 'ArrowUp': 3};
-      if (this.desireX < 0 || this.desireY < 0 || this.desireX >= tilemap.width || this.desireY >= tilemap.height || solid[this.gridY][this.gridX][directionMap[this.movementKeys[0]]] || solid[this.gridY + Math.sign(this.moveY)][this.gridX + Math.sign(this.moveX)][3 - directionMap[this.movementKeys[0]]]) {
+      if (this.desireX < 0 || this.desireY < 0 || this.desireX >= map.width || this.desireY >= map.height || solid[this.gridY][this.gridX][directionMap[this.movementKeys[0]]] || solid[this.gridY + Math.sign(this.moveY)][this.gridX + Math.sign(this.moveX)][3 - directionMap[this.movementKeys[0]]]) {
         this.moveX = 0;
         this.moveY = 0;
       }
