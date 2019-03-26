@@ -31,46 +31,52 @@ class TextboxEvent extends Event {
     this.container.addChild(bgRect);
 
     if (name) {
-      var nameText = new PIXI.Text(`[ ${name} ]`, new PIXI.TextStyle({
+      var nameRect = new PIXI.NineSlicePlane(PIXI.Loader.shared.resources['nineslice'].texture, 17, 17, 17, 17);
+      nameRect.y = -15;
+      nameRect.width = 100;
+      nameRect.height = 30;
+      this.container.addChild(nameRect);
+
+      var nameText = new PIXI.Text(name, new PIXI.TextStyle({
         fontFamily: 'Raleway',
         fontSize: 18,
         fontWeight: 600,
+        align: 'center',
         fill: '#FFFFFF',
         wordWrap: true,
         wordWrapWidth: 524
       }));
-      nameText.x = 10;
-      nameText.y = 10;
+      nameText.x = 50 - PIXI.TextMetrics.measureText(name, nameText.style).width / 2;
+      nameText.y = -9;
       this.container.addChild(nameText);
     }
 
-    this.text = new PIXI.Text('', new PIXI.TextStyle({
-      fontFamily: 'Raleway',
-      fontSize: 18,
-      fontWeight: 200,
-      fill: '#FFFFFF',
-      wordWrap: true,
-      wordWrapWidth: 524
-    }));
-    this.text.x = 10;
-    this.text.y = 30;
-    this.container.addChild(this.text);
-    
-    this.container.visible = false;
-    app.stage.addChild(this.container);
+    if (this.message) {
+      this.text = new PIXI.Text('', new PIXI.TextStyle({
+        fontFamily: 'Raleway',
+        fontSize: 18,
+        fontWeight: 200,
+        fill: '#FFFFFF',
+        wordWrap: true,
+        wordWrapWidth: 524
+      }));
+      this.text.x = 10;
+      this.text.y = 20;
+      this.container.addChild(this.text);
+    }
   }
 
   play(trigger) {
     super.play(trigger);
     
-    this.container.visible = true;
+    app.stage.addChild(this.container);
     this.reveal = 0;
     this.timer = 0;
-    this.text.text = '';
+    if (this.message) this.text.text = '';
   }
 
   update(delta) {
-    if (this.reveal == this.message.length) return;
+    if (!(this.message) || this.reveal == this.message.length) return;
     this.timer += delta;
     if (this.timer >= 3) {
       this.timer = 0;
@@ -88,12 +94,12 @@ class TextboxEvent extends Event {
 
   keyDown(key) {
     if (key == 'KeyZ') {
-      if (this.reveal == this.message.length) {
-        this.container.visible = false;
+      if (!(this.message) || this.reveal == this.message.length) {
+        app.stage.removeChild(this.container);
         this.trigger.done();
       } else {
         this.reveal = this.message.length;
-        this.text.text = this.message.substring(0, this.reveal);
+        if (this.message) this.text.text = this.message.substring(0, this.reveal);
       }
     }
   }
@@ -115,7 +121,13 @@ class SelectionEvent extends Event {
     bgRect.height = viewportHeight - this.container.y;
     this.container.addChild(bgRect);
 
-    if (name != '') {
+    if (name) {
+      var nameRect = new PIXI.NineSlicePlane(PIXI.Loader.shared.resources['nineslice'].texture, 17, 17, 17, 17);
+      nameRect.y = -15;
+      nameRect.width = 100;
+      nameRect.height = 30;
+      this.container.addChild(nameRect);
+
       var nameText = new PIXI.Text(name, new PIXI.TextStyle({
         fontFamily: 'Raleway',
         fontSize: 18,
@@ -124,21 +136,24 @@ class SelectionEvent extends Event {
         wordWrap: true,
         wordWrapWidth: 524
       }));
-      nameText.x = 10;
-      nameText.y = 10;
+      nameText.x = 50 - PIXI.TextMetrics.measureText(name, nameText.style).width / 2;
+      nameText.y = -9;
+      this.container.addChild(nameText);
     }
 
-    this.text = new PIXI.Text('', new PIXI.TextStyle({
-      fontFamily: 'Raleway',
-      fontSize: 18,
-      fontWeight: 200,
-      fill: '#FFFFFF',
-      wordWrap: true,
-      wordWrapWidth: 524
-    }));
-    this.text.x = 10;
-    this.text.y = 30;
-    this.container.addChild(this.text);
+    if (this.message) {
+      this.text = new PIXI.Text('', new PIXI.TextStyle({
+        fontFamily: 'Raleway',
+        fontSize: 18,
+        fontWeight: 200,
+        fill: '#FFFFFF',
+        wordWrap: true,
+        wordWrapWidth: 524
+      }));
+      this.text.x = 10;
+      this.text.y = 20;
+      this.container.addChild(this.text);
+    }
 
     var optionTextStyle = new PIXI.TextStyle({
       fontFamily: 'Raleway',
@@ -161,9 +176,6 @@ class SelectionEvent extends Event {
       this.container.addChild(optionRect);
       this.container.addChild(temp);
     }
-    
-    this.container.visible = false;
-    app.stage.addChild(this.container);
   }
 
   play(trigger) {
@@ -172,7 +184,7 @@ class SelectionEvent extends Event {
     this.reveal = 0;
     this.timer = 0;
     this.selection = this.defaultSelection;
-    this.text.text = '';
+    if (this.text) this.text.text = '';
 
     for (var i=0; i<this.optionRects.length; i++) {
       var notSelected = (i != this.selection);
@@ -183,11 +195,11 @@ class SelectionEvent extends Event {
       this.optionRects[i].height = 32 + (notSelected?-4:0);
       this.optionRects[i].tint = (notSelected?0xAAAAAA:0xFFFFFF)
     }
-    this.container.visible = true;
+    app.stage.addChild(this.container);
   }
 
   update(delta) {
-    if (this.reveal == this.message.length) return;
+    if (!(this.message) || this.reveal == this.message.length) return;
     this.timer += delta;
     if (this.timer >= 3) {
       this.timer = 0;
@@ -205,13 +217,13 @@ class SelectionEvent extends Event {
 
   keyDown(key) {
     if (key == 'KeyZ') {
-      if (this.reveal == this.message.length) {
-        this.container.visible = false;
+      if (!(this.message) || this.reveal == this.message.length) {
+        app.stage.removeChild(this.container);
         if (this.options[this.selection].channel) this.trigger.goto(this.options[this.selection].channel);
         else this.trigger.done();
       } else {
         this.reveal = this.message.length;
-        this.text.text = this.message.substring(0, this.reveal);
+        if (this.text) this.text.text = this.message.substring(0, this.reveal);
       }
     } else if (key == 'ArrowUp') {
       this.optionRects[this.selection].x += 2;
@@ -278,7 +290,7 @@ class MapChangeEvent extends Event {
 
   play(trigger) {
     super.play(trigger);
-    map.remove();
+    if (map) map.remove();
     map = maps[this.map];
 
     solid = [];
@@ -300,28 +312,50 @@ class MapChangeEvent extends Event {
 
     map.addTo(viewport);
 
-    player.gridX = this.playerX;
-    player.gridY = this.playerY;
-    player.targetX = this.playerX;
-    player.targetY = this.playerY;
-    
-    var animMap = {0: player.animDown, 1: player.animLeft, 2: player.animRight, 3: player.animUp};
-    player.sprite.textures = animMap[this.playerDirection];
-    player.sprite.gotoAndStop(0);
+    if (player) {
+      player.gridX = this.playerX;
+      player.gridY = this.playerY;
+      player.targetX = this.playerX;
+      player.targetY = this.playerY;
+      
+      var animMap = {0: player.animDown, 1: player.animLeft, 2: player.animRight, 3: player.animUp};
+      player.sprite.textures = animMap[this.playerDirection];
+      player.sprite.gotoAndStop(0);
 
-    player.remX = 0;
-    player.remY = 0;
-    player.moveX = 0;
-    player.moveY = 0;
+      player.remX = 0;
+      player.remY = 0;
+      player.moveX = 0;
+      player.moveY = 0;
+    } else {
+      player = new Player(this.playerX, this.playerY, party[party.default].texture);
+      player.addTo(viewport);
+    }
+
     trigger.done();
   }
 }
 
-class Trigger extends Entity {
-  constructor(gridX, gridY, sprite, solidInfo, eventStream) {
-    super(gridX, gridY, sprite);
-    this.solidInfo = solidInfo;
+class SoundEvent extends Event {
+  constructor(sound, async=false) {
+    super();
+    this.sound = sound;
+    this.async = async;
+  }
+
+  play(trigger) {
+    super.play(trigger);
+    var soundInstance = this.sound.play();
+    if (async) this.trigger.done();
+    else soundInstance.on('end', function() {
+      this.trigger.done();
+    });
+  }
+}
+
+class EventPlayer {
+  constructor(eventStream) {
     this.eventStream = eventStream;
+    this.signals = {};
     this.playing = false;
   }
 
@@ -338,7 +372,7 @@ class Trigger extends Entity {
       this.eventStream[this.channel][this.index].play(this);
     } else {
       this.playing = false;
-      player.unparalyze();
+      if (this.signals['done'] != undefined) this.signals['done']();
     }
   }
 
@@ -348,27 +382,51 @@ class Trigger extends Entity {
 
   update(delta) {
     if (this.playing) this.eventStream[this.channel][this.index].update(delta);
+  }
+
+  keyDown(key) {
+    if (this.playing) this.eventStream[this.channel][this.index].keyDown(key);
+  }
+
+  keyUp(key) {
+    if (this.playing) this.eventStream[this.channel][this.index].keyUp(key);
+  }
+
+  on(event, callback) {
+    this.signals[event] = callback;
+  }
+}
+
+class Trigger extends Entity {
+  constructor(gridX, gridY, sprite, solidInfo, eventPlayer) {
+    super(gridX, gridY, sprite);
+    this.solidInfo = solidInfo;
+    this.eventPlayer = eventPlayer;
+    this.eventPlayer.on('done', function() {player.unparalyze();});
+    this.playing = false;
+  }
+
+  update(delta) {
+    this.eventPlayer.update(delta);
     super.update(delta);
   }
 
   keyDown(key) {
-    if (!this.playing && key == 'KeyZ') {
+    if (!this.eventPlayer.playing && key == 'KeyZ') {
       if (
         (player.gridX == this.gridX && player.gridY == this.gridY) ||
         (player.desireX == this.gridX && player.desireY == this.gridY)
       ) {
         player.paralyze();
-        this.play();
+        this.eventPlayer.play();
       }
-    } else if (this.playing) {
-      this.eventStream[this.channel][this.index].keyDown(key);
+    } else {
+      this.eventPlayer.keyDown(key);
     }
   }
 
   keyUp(key) {
-    if (this.playing) {
-      this.eventStream[this.channel][this.index].keyUp(key);
-    }
+    this.eventPlayer.keyUp(key);
   }
 
   addTo(container) {
@@ -401,7 +459,7 @@ class NPC extends Trigger {
 
   update(delta) {
     if (this.remX == 0 && this.remY == 0) {
-      if (this.playing) {
+      if (this.eventPlayer.playing) {
         if (player.gridX < this.gridX) this.sprite.textures = this.animLeft;
         else if (player.gridX > this.gridX) this.sprite.textures = this.animRight;
         else if (player.gridY < this.gridY) this.sprite.textures = this.animUp;
@@ -453,16 +511,16 @@ class NPC extends Trigger {
   }
 
   keyDown(key) {
-    if (!this.playing && key == 'KeyZ') {
+    if (!this.eventPlayer.playing && key == 'KeyZ') {
       if (
         (player.gridX == this.gridX + ((this.moveX > 0)?1:0) && player.gridY == this.gridY + ((this.moveY > 0)?1:0)) ||
         (player.desireX == this.gridX + ((this.moveX > 0)?1:0) && player.desireY == this.gridY + ((this.moveY > 0)?1:0))
       ) {
         player.paralyze();
-        this.play();
+        this.eventPlayer.play();
       }
-    } else if (this.playing) {
-      this.eventStream[this.channel][this.index].keyDown(key);
+    } else {
+      this.eventPlayer.keyDown(key);
     }
   }
 }

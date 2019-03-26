@@ -17,10 +17,12 @@ PIXI.Loader.shared.add('knight', 'res/characters/knight.png')
                   .add('nineslice', 'res/gui/nineslice.png')
                   .load(setup);
 
-var player;
-var maps, tileset, map;
-var triggers;
-var solid;
+var player, party = {};
+var maps = {}, tilesets = {}, map;
+var triggers = [];
+var solid = [];
+
+var eventPlayers = []; // TODO: Per-map EventPlayers. EventPlayer Event. Load in MapChangeEvent.
 
 var viewport = new PIXI.Container();
 app.stage.addChild(viewport);
@@ -37,9 +39,68 @@ function zSort(a, b) {
 function setup() {
   setDebug(false);
 
-  tileset = new Tileset(PIXI.Loader.shared.resources['darkdimension'].texture, {"65":[true,true,true,true],"66":[true,true,true,true],"88":[true,true,true,true],"89":[true,true,true,true],"90":[true,true,true,true],"91":[true,true,true,true],"92":[true,true,true,true],"93":[true,true,true,true],"94":[true,true,true,true],"95":[true,true,true,true],"117":[true,true,true,true],"118":[true,true,true,true],"119":[true,true,true,true],"120":[true,true,true,true],"121":[true,true,true,true],"122":[true,true,true,true],"123":[true,true,true,true],"124":[true,true,true,true],"146":[true,true,true,true],"147":[true,true,true,true],"148":[true,true,true,true],"149":[true,true,true,true],"150":[true,true,true,true],"151":[true,true,true,true],"152":[true,true,true,true],"153":[true,true,true,true],"178":[true,true,true,true],"179":[true,true,true,true],"180":[true,true,true,true],"181":[true,true,true,true],"182":[true,true,true,true],"207":[false,true,false,true],"208":[false,false,false,true],"209":[false,false,true,true],"236":[false,true,false,false],"238":[false,false,true,false],"265":[true,true,false,false],"266":[true,false,false,false],"267":[true,false,true,false],"294":[false,true,false,false],"296":[false,false,true,false],"297":[false,true,true,false],"323":[true,true,false,false],"324":[true,false,false,false],"325":[true,false,true,false],"326":[false,true,true,false],"381":[true,true,false,false],"382":[true,false,false,false],"383":[true,false,true,false]});
+  party = {
+    default: 'knight',
+    'knight': {
+      texture: PIXI.Loader.shared.resources['knight'].texture
+    }
+  };
+
+  tilesets = {
+    'darkdimension': new Tileset(PIXI.Loader.shared.resources['darkdimension'].texture, {
+      "65": [true,true,true,true],
+      "66": [true,true,true,true],
+      "88": [true,true,true,true],
+      "89": [true,true,true,true],
+      "90": [true,true,true,true],
+      "91": [true,true,true,true],
+      "92": [true,true,true,true],
+      "93": [true,true,true,true],
+      "94": [true,true,true,true],
+      "95": [true,true,true,true],
+      "117": [true,true,true,true],
+      "118": [true,true,true,true],
+      "119": [true,true,true,true],
+      "120": [true,true,true,true],
+      "121": [true,true,true,true],
+      "122": [true,true,true,true],
+      "123": [true,true,true,true],
+      "124": [true,true,true,true],
+      "146": [true,true,true,true],
+      "147": [true,true,true,true],
+      "148": [true,true,true,true],
+      "149": [true,true,true,true],
+      "150": [true,true,true,true],
+      "151": [true,true,true,true],
+      "152": [true,true,true,true],
+      "153": [true,true,true,true],
+      "178": [true,true,true,true],
+      "179": [true,true,true,true],
+      "180": [true,true,true,true],
+      "181": [true,true,true,true],
+      "182": [true,true,true,true],
+      "207": [false,true,false,true],
+      "208": [false,false,false,true],
+      "209": [false,false,true,true],
+      "236": [false,true,false,false],
+      "238": [false,false,true,false],
+      "265": [true,true,false,false],
+      "266": [true,false,false,false],
+      "267": [true,false,true,false],
+      "294": [false,true,false,false],
+      "296": [false,false,true,false],
+      "297": [false,true,true,false],
+      "323": [true,true,false,false],
+      "324": [true,false,false,false],
+      "325": [true,false,true,false],
+      "326": [false,true,true,false],
+      "381": [true,true,false,false],
+      "382": [true,false,false,false],
+      "383": [true,false,true,false]
+    })
+  };
   maps = {
-    'darkdimension': new Tilemap(tileset, [
+    'darkdimension': new Tilemap(tilesets['darkdimension'], [
       [
         [468,495,497,466,437,529,526,470,528,528,529,497,523,437,437,468,530,528,525,495,470,440,529,441,523],
         [442,436,524,523,439,496,438,471,440,441,466,443,494,443,496,526,499,467,523,494,501,442,472,439,468],
@@ -120,33 +181,33 @@ function setup() {
         [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1]
       ]
     ], [
-      new NPC(5, 5, PIXI.Loader.shared.resources['joe'].texture, {
-        'main':[
+      new NPC(5, 5, PIXI.Loader.shared.resources['joe'].texture, new EventPlayer({
+        'main': [
           new TextboxEvent('Why, hello there, young man!', '???', PIXI.Loader.shared.resources['voice'].sound),
           new TextboxEvent('The name\'s Joe! Nice to meet you!', 'Joe', PIXI.Loader.shared.resources['voice'].sound),
           new DelayEvent(180),
           new TextboxEvent('Well, I hope to see you around.', 'Joe', PIXI.Loader.shared.resources['voice'].sound)
         ]
-      }),
-      new Trigger(21, 15, null, [true, true, true, true], {
-        'main':[
+      })),
+      new Trigger(21, 15, null, [true, true, true, true], new EventPlayer({
+        'main': [
           new TextboxEvent('A diamond crystal. It\'s floating..?', null, PIXI.Loader.shared.resources['voice'].sound),
-          new SelectionEvent('Take it?', [{'text': 'Yes', 'channel': 'take'}, {'text': 'No', 'channel': 'dontTake'}], null, PIXI.Loader.shared.resources['voice'].sound)
+          new SelectionEvent('Take it?', [{text: 'Yes', channel: 'take'}, {text: 'No', channel: 'dontTake'}], null, PIXI.Loader.shared.resources['voice'].sound)
         ],
-        'take':[
+        'take': [
           new DelayEvent(120),
           new TextboxEvent('You try to take the diamond crystal, but it doesn\'t budge.', null, PIXI.Loader.shared.resources['voice'].sound)
         ],
-        'dontTake':[
+        'dontTake': [
           new TextboxEvent('The diamond crystal is glowing. It feels like it\'s pulling my hand towards it.', 'Knight', PIXI.Loader.shared.resources['voice'].sound),
-          new SelectionEvent('Reach out and touch the crystal?', [{'text': 'Yes', 'channel': 'touch'}, {'text': 'No'}], null, PIXI.Loader.shared.resources['voice'].sound)
+          new SelectionEvent('Reach out and touch the crystal?', [{text: 'Yes', channel: 'touch'}, {text: 'No'}], null, PIXI.Loader.shared.resources['voice'].sound)
         ],
-        'touch':[
+        'touch': [
           new MapChangeEvent('tproom', 8, 5, 0)
         ]
-      })
+      }))
     ], 25, 25),
-    'tproom': new Tilemap(tileset, [
+    'tproom': new Tilemap(tilesets['darkdimension'], [
       [
         [524,525,439,467,468,468,436,523,501,498,527,499,528,443,499,528,471],
         [530,440,527,466,466,501,466,467,442,465,524,528,470,468,470,494,494],
@@ -205,47 +266,37 @@ function setup() {
         [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1]
       ]
     ], [
-      new Trigger(8, 4, null, [true, true, true, true], {
-        'main':[
+      new Trigger(8, 4, null, [true, true, true, true], new EventPlayer({
+        'main': [
           new TextboxEvent('I think this is a portal back to the dark dimension.', 'Knight', PIXI.Loader.shared.resources['voice'].sound),
-          new SelectionEvent('Go through the portal?', [{'text': 'Yes', 'channel': 'teleport'}, {'text': 'No'}], null, PIXI.Loader.shared.resources['voice'].sound)
+          new SelectionEvent('Go through the portal?', [{text: 'Yes', channel: 'teleport'}, {text: 'No'}], null, PIXI.Loader.shared.resources['voice'].sound)
         ],
-        'teleport':[
+        'teleport': [
           new MapChangeEvent('darkdimension', 20, 15, 1)
         ]
-      }),
-      new Trigger(8, 7, null, [true, true, true, true], {
-        'main':[
+      })),
+      new Trigger(8, 7, null, [true, true, true, true], new EventPlayer({
+        'main': [
           new TextboxEvent('I think this is a portal back home.', 'Knight', PIXI.Loader.shared.resources['voice'].sound),
-          new SelectionEvent('Go through the portal?', [{'text': 'Yes', 'channel': 'teleport'}, {'text': 'No'}], null, PIXI.Loader.shared.resources['voice'].sound)
+          new SelectionEvent('Go through the portal?', [{text: 'Yes', channel: 'teleport'}, {text: 'No'}], null, PIXI.Loader.shared.resources['voice'].sound)
         ],
-        'teleport':[
+        'teleport': [
           new DelayEvent(120),
           new TextboxEvent('...I can\'t get the portal to activate.', 'Knight', PIXI.Loader.shared.resources['voice'].sound)
         ]
-      })
+      }))
     ], 17, 13)
   };
 
-  map = maps['darkdimension'];
-
-  map.addTo(viewport);
-  
-  solid = [];
-  
-  for (var i=0; i<map.solid.length; i++) {
-    solid.push(map.solid[i].slice());
-  }
-
-  triggers = [];
-
-  for (var i=0; i<map.triggers.length; i++) {
-    triggers.push(map.triggers[i]);
-    map.triggers[i].addTo(viewport);
-  }
-  
-  player = new Player(7, 11, PIXI.Loader.shared.resources['knight'].texture);
-  player.addTo(viewport);
+  eventPlayers.push(new EventPlayer({
+    'main': [
+      new SelectionEvent(null, [{text: 'New Game', channel: 'newGame'}, {text: 'Load Game', channel: ''}, {text: 'Options', channel: ''}, {text: 'End Game', channel: ''}]),
+    ], 
+    'newGame': [
+      new MapChangeEvent('darkdimension', 7, 11, 0)
+    ]
+  }));
+  eventPlayers[0].play();
 
   minFPS = app.ticker.FPS;
   fpsText = new PIXI.Text(`${app.ticker.FPS}\n${minFPS}`, new PIXI.TextStyle({
@@ -264,13 +315,18 @@ function setup() {
 function update(delta) {
   if (debug) debugGraphics.clear();
 
-  player.update(delta);
+  if (player) player.update(delta);
   for (var i=0; i<triggers.length; i++) {
     triggers[i].update(delta);
   }
+  for (var i=0; i<eventPlayers.length; i++) {
+    eventPlayers[i].update(delta);
+  }
 
-  viewport.x = Math.round(Math.clamp(viewportWidth / 2 - player.x - gridWidth / 2, -(map.width * gridWidth - viewportWidth), 0));
-  viewport.y = Math.round(Math.clamp(viewportHeight / 2 - player.y - gridHeight / 2, -(map.height * gridHeight - viewportHeight), 0));
+  if (player) {
+    viewport.x = Math.round(Math.clamp(viewportWidth / 2 - player.x - gridWidth / 2, -(map.width * gridWidth - viewportWidth), 0));
+    viewport.y = Math.round(Math.clamp(viewportHeight / 2 - player.y - gridHeight / 2, -(map.height * gridHeight - viewportHeight), 0));
+  }
 
   viewport.children.sort(zSort);
 
@@ -297,16 +353,22 @@ function setDebug(x) {
 }
 
 function keyDown(e) {
-  player.keyDown(e.code);
+  if (player) player.keyDown(e.code);
   for (var i=0; i<triggers.length; i++) {
     triggers[i].keyDown(e.code);
+  }
+  for (var i=0; i<eventPlayers.length; i++) {
+    eventPlayers[i].keyDown(e.code);
   }
 }
 
 function keyUp(e) {
-  player.keyUp(e.code);
+  if (player) player.keyUp(e.code);
   for (var i=0; i<triggers.length; i++) {
     triggers[i].keyUp(e.code);
+  }
+  for (var i=0; i<eventPlayers.length; i++) {
+    eventPlayers[i].keyUp(e.code);
   }
 }
 
