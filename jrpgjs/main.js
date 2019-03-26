@@ -22,6 +22,8 @@ var maps = {}, tilesets = {}, map;
 var triggers = [];
 var solid = [];
 
+var variables = {};
+
 var eventPlayers = []; // TODO: Per-map EventPlayers. EventPlayer Event. Load in MapChangeEvent.
 
 var viewport = new PIXI.Container();
@@ -290,9 +292,11 @@ function setup() {
 
   eventPlayers.push(new EventPlayer({
     'main': [
+      new PictureEvent(PIXI.Loader.shared.resources['knight'].texture, 0, 0, viewportWidth, viewportHeight, true, 'titleBG'),
       new SelectionEvent(null, [{text: 'New Game', channel: 'newGame'}, {text: 'Load Game', channel: ''}, {text: 'Options', channel: ''}, {text: 'End Game', channel: ''}]),
     ], 
     'newGame': [
+      new CodeEvent('app.stage.removeChild(variables.titleBG);'),
       new MapChangeEvent('darkdimension', 7, 11, 0)
     ]
   }));

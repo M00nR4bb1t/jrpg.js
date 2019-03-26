@@ -116,11 +116,13 @@ class SelectionEvent extends Event {
     this.defaultSelection = selection;
     this.voice = voice;
     
-    var bgRect = new PIXI.NineSlicePlane(PIXI.Loader.shared.resources['nineslice'].texture, 17, 17, 17, 17);
-    bgRect.width = viewportWidth;
-    bgRect.height = viewportHeight - this.container.y;
-    this.container.addChild(bgRect);
-
+    if (this.message) {
+      var bgRect = new PIXI.NineSlicePlane(PIXI.Loader.shared.resources['nineslice'].texture, 17, 17, 17, 17);
+      bgRect.width = viewportWidth;
+      bgRect.height = viewportHeight - this.container.y;
+      this.container.addChild(bgRect);
+    }
+    
     if (name) {
       var nameRect = new PIXI.NineSlicePlane(PIXI.Loader.shared.resources['nineslice'].texture, 17, 17, 17, 17);
       nameRect.y = -15;
@@ -164,17 +166,23 @@ class SelectionEvent extends Event {
       wordWrapWidth: 524
     });
 
+    this.optionBgRect = new PIXI.NineSlicePlane(PIXI.Loader.shared.resources['nineslice'].texture, 17, 17, 17, 17);
+    this.optionBgRect.width = Math.round(viewportWidth * 0.25) + 10;
+    this.optionBgRect.height = (32 * this.options.length) + 10;
+    this.optionBgRect.x = (this.message)?(viewportWidth - this.optionBgRect.width):((viewportWidth - Math.round(viewportWidth * 0.25))/2 - 5);
+    this.optionBgRect.y = (this.message)?(bgRect.y - this.optionBgRect.height):0;
+    this.container.addChild(this.optionBgRect);
+
     this.optionRects = [];
     for (var i=0; i<options.length; i++) {
       var temp = new PIXI.Text(options[i].text, optionTextStyle);
-      temp.x = viewportWidth - Math.round(viewportWidth * 0.25) + 8;
-      temp.y = 32 * (i - options.length) + 8;
+      temp.x = Math.round(this.optionBgRect.width/2 - PIXI.TextMetrics.measureText(options[i].text, optionTextStyle).width/2);
+      temp.y = 32 * i + 13;
 
       var optionRect = new PIXI.NineSlicePlane(PIXI.Loader.shared.resources['nineslice'].texture, 17, 17, 17, 17);
       this.optionRects.push(optionRect);
-
-      this.container.addChild(optionRect);
-      this.container.addChild(temp);
+      this.optionBgRect.addChild(optionRect);
+      this.optionBgRect.addChild(temp);
     }
   }
 
@@ -188,12 +196,12 @@ class SelectionEvent extends Event {
 
     for (var i=0; i<this.optionRects.length; i++) {
       var notSelected = (i != this.selection);
-
-      this.optionRects[i].x = viewportWidth - Math.round(viewportWidth * 0.25) + (notSelected?2:0);
-      this.optionRects[i].y = 32 * (i - this.options.length) + (notSelected?2:0);
+      
+      this.optionRects[i].x = 5 + (notSelected?2:0);
+      this.optionRects[i].y = 32 * i + (notSelected?2:0) + 5;
       this.optionRects[i].width = Math.round(viewportWidth * 0.25) + (notSelected?-4:0);
       this.optionRects[i].height = 32 + (notSelected?-4:0);
-      this.optionRects[i].tint = (notSelected?0xAAAAAA:0xFFFFFF)
+      this.optionRects[i].tint = (notSelected?0xAAAAAA:0xFFFFFF);
     }
     app.stage.addChild(this.container);
   }
@@ -336,19 +344,92 @@ class MapChangeEvent extends Event {
 }
 
 class SoundEvent extends Event {
-  constructor(sound, async=false) {
+  constructor(sound, async=false, variableName) {
     super();
     this.sound = sound;
     this.async = async;
+    this.variableName = variableName;
   }
 
   play(trigger) {
     super.play(trigger);
     var soundInstance = this.sound.play();
+    if (this.variableName) {
+      variables[this.variableName] = soundInstance;
+    }
     if (async) this.trigger.done();
     else soundInstance.on('end', function() {
       this.trigger.done();
     });
+  }
+}
+
+class PictureEvent extends Event {
+  constructor(texture, x, y, width, height, async=false, variableName) {
+    super();
+    this.graphics = variables[variableName] = new PIXI.Graphics();
+    this.graphics.beginTextureFill(texture, 0xFFFFFF, 1, new PIXI.Matrix(width / texture.width, 0, 0, height / texture.height, x, y));
+    this.graphics.drawRect(0, 0, width, height);
+    this.async = async;
+  }
+
+  play(trigger) {
+    super.play(trigger);
+    app.stage.addChild(this.graphics);
+    if (this.async) this.trigger.done();
+  }
+
+  keyDown(key) {
+    if (key == 'KeyZ') {
+      this.trigger.done();
+      app.stage.removeChild(this.graphics);
+    }
+  }
+}
+
+class SetVariableEvent extends Event {
+  constructor(variableName, value) {
+    super();
+    this.variableName = variableName;
+    this.value = value;
+  }
+
+  play(trigger) {
+    super.play(trigger);
+    variables[this.variable] = this.value;
+    this.trigger.done();
+  }
+}
+
+class CodeEvent extends Event {
+  constructor(code) {
+    super();
+    this.code = code;
+  }
+
+  play(trigger) {
+    super.play(trigger);
+    eval(this.code);
+    this.trigger.done();
+  }
+}
+
+class ConditionalEvent extends Event {
+  constructor(conditional, trueChannel, falseChannel) {
+    super();
+    this.code = code;
+    this.trueChannel = trueChannel;
+    this.falseChannel = falseChannel;
+  }
+
+  play(trigger) {
+    super.play(trigger);
+    if (eval(this.code)) {
+      this.trigger.goto(this.trueChannel);
+    } else {
+      this.trigger.goto(this.falseChannel);
+    }
+    this.trigger.done();
   }
 }
 
