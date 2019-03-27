@@ -2,9 +2,12 @@ class Tileset {
   constructor(texture, solidTiles) {
     this.textures = [];
     this.solidTiles = solidTiles;
-    for (var j=0; j<texture.height / gridHeight; j++) {
-      for (var i=0; i<texture.width / gridWidth; i++) {
-        this.textures.push(new PIXI.Texture(texture, new PIXI.Rectangle(i * gridWidth, j * gridHeight, gridWidth, gridHeight)));
+    
+    var _texture = PIXI.Loader.shared.resources[texture].texture;
+
+    for (var j=0; j<_texture.height / gridHeight; j++) {
+      for (var i=0; i<_texture.width / gridWidth; i++) {
+        this.textures.push(new PIXI.Texture(_texture, new PIXI.Rectangle(i * gridWidth, j * gridHeight, gridWidth, gridHeight)));
       }
     }
   }

@@ -23,7 +23,7 @@ class TextboxEvent extends Event {
     this.container.y = viewportHeight - Math.round(viewportHeight * 0.4);
     this.container.z = Number.MAX_VALUE;
     this.message = message;
-    this.voice = voice;
+    if (voice) this.voice = PIXI.Loader.shared.resources[voice].sound;
     
     var bgRect = new PIXI.NineSlicePlane(PIXI.Loader.shared.resources['nineslice'].texture, 17, 17, 17, 17);
     bgRect.width = viewportWidth;
@@ -114,7 +114,7 @@ class SelectionEvent extends Event {
     this.message = message;
     this.options = options;
     this.defaultSelection = selection;
-    this.voice = voice;
+    if (voice) this.voice = PIXI.Loader.shared.resources[voice].sound;
     
     if (this.message) {
       var bgRect = new PIXI.NineSlicePlane(PIXI.Loader.shared.resources['nineslice'].texture, 17, 17, 17, 17);
@@ -335,7 +335,7 @@ class MapChangeEvent extends Event {
       player.moveX = 0;
       player.moveY = 0;
     } else {
-      player = new Player(this.playerX, this.playerY, party[party.default].texture);
+      player = new Player(this.playerX, this.playerY, party.characters[party.default].texture);
       player.addTo(viewport);
     }
 
@@ -368,7 +368,7 @@ class PictureEvent extends Event {
   constructor(texture, x, y, width, height, async=false, variableName) {
     super();
     this.graphics = variables[variableName] = new PIXI.Graphics();
-    this.graphics.beginTextureFill(texture, 0xFFFFFF, 1, new PIXI.Matrix(width / texture.width, 0, 0, height / texture.height, x, y));
+    this.graphics.beginTextureFill(PIXI.Loader.shared.resources[texture].texture, 0xFFFFFF, 1, new PIXI.Matrix(width / PIXI.Loader.shared.resources[texture].texture.width, 0, 0, height / PIXI.Loader.shared.resources[texture].texture.height, x, y));
     this.graphics.drawRect(0, 0, width, height);
     this.async = async;
   }
@@ -523,10 +523,11 @@ class NPC extends Trigger {
     this.targetX = gridX;
     this.targetY = gridY;
 
-    this.animDown = [new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0, texture.height * 0, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.25, texture.height * 0, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.5, texture.height * 0, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.75, texture.height * 0, texture.width * 0.25, texture.height * 0.25))];
-    this.animLeft = [new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0, texture.height * 0.25, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.25, texture.height * 0.25, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.5, texture.height * 0.25, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.75, texture.height * 0.25, texture.width * 0.25, texture.height * 0.25))];
-    this.animRight = [new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0, texture.height * 0.5, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.25, texture.height * 0.5, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.5, texture.height * 0.5, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.75, texture.height * 0.5, texture.width * 0.25, texture.height * 0.25))];
-    this.animUp = [new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0, texture.height * 0.75, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.25, texture.height * 0.75, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.5, texture.height * 0.75, texture.width * 0.25, texture.height * 0.25)), new PIXI.Texture(texture, new PIXI.Rectangle(texture.width * 0.75, texture.height * 0.75, texture.width * 0.25, texture.height * 0.25))];
+    var _texture = PIXI.Loader.shared.resources[texture].texture;
+    this.animDown = [new PIXI.Texture(_texture, new PIXI.Rectangle(_texture.width * 0, _texture.height * 0, _texture.width * 0.25, _texture.height * 0.25)), new PIXI.Texture(_texture, new PIXI.Rectangle(_texture.width * 0.25, _texture.height * 0, _texture.width * 0.25, _texture.height * 0.25)), new PIXI.Texture(_texture, new PIXI.Rectangle(_texture.width * 0.5, _texture.height * 0, _texture.width * 0.25, _texture.height * 0.25)), new PIXI.Texture(_texture, new PIXI.Rectangle(_texture.width * 0.75, _texture.height * 0, _texture.width * 0.25, _texture.height * 0.25))];
+    this.animLeft = [new PIXI.Texture(_texture, new PIXI.Rectangle(_texture.width * 0, _texture.height * 0.25, _texture.width * 0.25, _texture.height * 0.25)), new PIXI.Texture(_texture, new PIXI.Rectangle(_texture.width * 0.25, _texture.height * 0.25, _texture.width * 0.25, _texture.height * 0.25)), new PIXI.Texture(_texture, new PIXI.Rectangle(_texture.width * 0.5, _texture.height * 0.25, _texture.width * 0.25, _texture.height * 0.25)), new PIXI.Texture(_texture, new PIXI.Rectangle(_texture.width * 0.75, _texture.height * 0.25, _texture.width * 0.25, _texture.height * 0.25))];
+    this.animRight = [new PIXI.Texture(_texture, new PIXI.Rectangle(_texture.width * 0, _texture.height * 0.5, _texture.width * 0.25, _texture.height * 0.25)), new PIXI.Texture(_texture, new PIXI.Rectangle(_texture.width * 0.25, _texture.height * 0.5, _texture.width * 0.25, _texture.height * 0.25)), new PIXI.Texture(_texture, new PIXI.Rectangle(_texture.width * 0.5, _texture.height * 0.5, _texture.width * 0.25, _texture.height * 0.25)), new PIXI.Texture(_texture, new PIXI.Rectangle(_texture.width * 0.75, _texture.height * 0.5, _texture.width * 0.25, _texture.height * 0.25))];
+    this.animUp = [new PIXI.Texture(_texture, new PIXI.Rectangle(_texture.width * 0, _texture.height * 0.75, _texture.width * 0.25, _texture.height * 0.25)), new PIXI.Texture(_texture, new PIXI.Rectangle(_texture.width * 0.25, _texture.height * 0.75, _texture.width * 0.25, _texture.height * 0.25)), new PIXI.Texture(_texture, new PIXI.Rectangle(_texture.width * 0.5, _texture.height * 0.75, _texture.width * 0.25, _texture.height * 0.25)), new PIXI.Texture(_texture, new PIXI.Rectangle(_texture.width * 0.75, _texture.height * 0.75, _texture.width * 0.25, _texture.height * 0.25))];
 
     this.sprite = new PIXI.AnimatedSprite(this.animDown);
     this.sprite.anchor.set(0.5, 1);
